@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../../utils/api'
 
 const Toggle = ({ value, onChange }) => (
   <button
@@ -18,6 +20,41 @@ const EditProfile = () => {
   const [theme, setTheme] = useState('light')
   const [githubUsername, setGithubUsername] = useState('devrahul')
   const [leetcodeUsername, setLeetcodeUsername] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const { getToken } = useAuth()
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true)
+      const token = await getToken()
+      
+      if (!token) {
+        alert('Authentication failed: Could not get Clerk session token. Please try logging out and in again.')
+        setIsSaving(false)
+        return
+      }
+      
+      await api.post('/api/users/profile', {
+        name,
+        title,
+        summary,
+        location,
+        isOpenToWork: openToWork,
+        theme,
+        githubUsername,
+        leetcodeUsername
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      alert('Profile saved successfully!')
+    } catch (err) {
+      console.error('Failed to save profile:', err)
+      alert('Failed to save profile')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const inputClass = "w-full rounded-lg border border-black/[0.05] bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-violet-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-100"
 
@@ -135,11 +172,15 @@ const EditProfile = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <button className="rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-2.5 text-sm font-medium text-white hover:from-violet-700 hover:to-purple-700">
-            Save Changes
-          </button>
-        </div>
+      <div className="flex justify-end">
+        <button 
+          onClick={handleSave}
+          disabled={isSaving}
+          className="rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-2.5 text-sm font-medium text-white hover:from-violet-700 hover:to-purple-700 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
 
       </div>
     </div>

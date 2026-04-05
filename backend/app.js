@@ -20,4 +20,12 @@ const userRoutes = require('./routes/user.routes')
 
 app.use('/api/users', userRoutes)
 
+// Global error handler (catches Clerk requireAuth errors)
+app.use((err, req, res, next) => {
+  logger.error(`Express Error: ${err.message}`)
+  res.status(err.status || 500).json({ 
+    message: err.message || 'An unexpected error occurred'
+  })
+})
+
 module.exports = app
