@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import axios from 'axios'
 
 import Landing from './pages/Landing'
 // import Explore from './pages/Explore'
@@ -8,6 +10,17 @@ import Dashboard from './pages/Dashboard'
 
 const ProtectedRoute = ({ children }) => {
   const { isSignedIn, isLoaded } = useAuth()
+  const { user } = useUser()
+
+  useEffect(() => {
+    if (isSignedIn && user) {
+      axios.post('http://localhost:4000/api/users/sync', {
+        clerkId: user.id,
+        username: user.username,
+        email: user.primaryEmailAddress?.emailAddress,
+      }).catch((err) => console.error('User sync failed:', err))
+    }
+  }, [isSignedIn, user])
 
   if (!isLoaded) return null
 
