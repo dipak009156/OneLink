@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import api from './utils/api'
 
 import Landing from './pages/Landing'
 // import Explore from './pages/Explore'
@@ -7,7 +9,22 @@ import Dashboard from './pages/Dashboard'
 // import PublicProfile from './pages/PublicProfile'
 
 const ProtectedRoute = ({ children }) => {
-  const { isSignedIn, isLoaded } = useAuth()
+  const { isSignedIn, isLoaded, getToken } = useAuth()
+  const { user } = useUser()
+
+  useEffect(() => {
+    if (isSignedIn && user) {
+      getToken().then(token => {
+        api.post('/api/users/sync', {
+          clerkId: user.id,
+          username: user.username,
+          email: user.primaryEmailAddress?.emailAddress,
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch((err) => console.error('User sync failed:', err))
+      })
+    }
+  }, [isSignedIn, user])
 
   if (!isLoaded) return null
 
