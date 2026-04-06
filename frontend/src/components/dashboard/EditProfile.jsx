@@ -11,7 +11,7 @@ const Toggle = ({ value, onChange }) => (
   </button>
 )
 
-const EditProfile = () => {
+const EditProfile = ({ refreshStats }) => {
   const [name, setName] = useState('Rahul Sharma')
   const [title, setTitle] = useState('Frontend Developer')
   const [summary, setSummary] = useState('Pixel perfect, every time')
@@ -21,7 +21,49 @@ const EditProfile = () => {
   const [githubUsername, setGithubUsername] = useState('devrahul')
   const [leetcodeUsername, setLeetcodeUsername] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [githubConnecting, setGithubConnecting] = useState(false)
+  const [githubStatus, setGithubStatus] = useState(null) // null | 'success' | 'error'
+  const [leetcodeConnecting, setLeetcodeConnecting] = useState(false)
+  const [leetcodeStatus, setLeetcodeStatus] = useState(null)
   const { getToken } = useAuth()
+
+  const handleConnectGitHub = async () => {
+    if (!githubUsername.trim()) return
+    try {
+      setGithubConnecting(true)
+      setGithubStatus(null)
+      const token = await getToken()
+      await api.post('/api/platform/connect/github', { githubUsername: githubUsername.trim() }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setGithubStatus('success')
+      if (refreshStats) refreshStats()
+    } catch (err) {
+      console.error('GitHub connect failed:', err)
+      setGithubStatus('error')
+    } finally {
+      setGithubConnecting(false)
+    }
+  }
+
+  const handleConnectLeetCode = async () => {
+    if (!leetcodeUsername.trim()) return
+    try {
+      setLeetcodeConnecting(true)
+      setLeetcodeStatus(null)
+      const token = await getToken()
+      await api.post('/api/platform/connect/leetcode', { leetcodeUsername: leetcodeUsername.trim() }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setLeetcodeStatus('success')
+      if (refreshStats) refreshStats()
+    } catch (err) {
+      console.error('LeetCode connect failed:', err)
+      setLeetcodeStatus('error')
+    } finally {
+      setLeetcodeConnecting(false)
+    }
+  }
 
   const handleSave = async () => {
     try {
@@ -156,7 +198,19 @@ const EditProfile = () => {
               </label>
               <div className="flex gap-3">
                 <input type="text" value={githubUsername} onChange={e => setGithubUsername(e.target.value)} className={`flex-1 ${inputClass}`} placeholder="Enter your GitHub username" />
-                <button className="rounded-lg border border-black/[0.05] bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Connect</button>
+                <button
+                  onClick={handleConnectGitHub}
+                  disabled={githubConnecting || !githubUsername.trim()}
+                  className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    githubStatus === 'success'
+                      ? 'border-green-200 bg-green-50 text-green-700'
+                      : githubStatus === 'error'
+                        ? 'border-red-200 bg-red-50 text-red-700'
+                        : 'border-black/[0.05] bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {githubConnecting ? 'Connecting...' : githubStatus === 'success' ? 'Connected ✓' : githubStatus === 'error' ? 'Failed ✕' : 'Connect'}
+                </button>
               </div>
             </div>
             <div>
@@ -166,7 +220,19 @@ const EditProfile = () => {
               </label>
               <div className="flex gap-3">
                 <input type="text" value={leetcodeUsername} onChange={e => setLeetcodeUsername(e.target.value)} className={`flex-1 ${inputClass}`} placeholder="Enter your LeetCode username" />
-                <button className="rounded-lg border border-black/[0.05] bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Connect</button>
+                <button
+                  onClick={handleConnectLeetCode}
+                  disabled={leetcodeConnecting || !leetcodeUsername.trim()}
+                  className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    leetcodeStatus === 'success'
+                      ? 'border-green-200 bg-green-50 text-green-700'
+                      : leetcodeStatus === 'error'
+                        ? 'border-red-200 bg-red-50 text-red-700'
+                        : 'border-black/[0.05] bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {leetcodeConnecting ? 'Connecting...' : leetcodeStatus === 'success' ? 'Connected ✓' : leetcodeStatus === 'error' ? 'Failed ✕' : 'Connect'}
+                </button>
               </div>
             </div>
           </div>

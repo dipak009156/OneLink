@@ -1,18 +1,69 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@clerk/clerk-react'
+import api from '../../utils/api'
 
 const ExperienceForm = () => {
+  const [loading, setLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveStatus, setSaveStatus] = useState(null) // null | 'success' | 'error'
   const [status, setStatus] = useState('fresher')
   const [form, setForm] = useState({
+    currentRole: '',
     company: '',
-    position: '',
-    startDate: '',
-    currentlyWorking: true,
-    institution: '',
-    degree: 'B.Tech Computer Science',
-    graduationYear: '2024',
-    lookingFor: '',
-    preferredLocation: '',
+    yearsOfExp: '',
+    degree: '',
+    college: '',
+    graduationYear: '',
+    headline: '',
   })
+  const { getToken } = useAuth()
+
+  useEffect(() => {
+    const fetchExperience = async () => {
+      try {
+        const token = await getToken()
+        const res = await api.get('/api/experience', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.data.experience) {
+          const exp = res.data.experience
+          setStatus(exp.status || 'fresher')
+          setForm({
+            currentRole: exp.currentRole || '',
+            company: exp.company || '',
+            yearsOfExp: exp.yearsOfExp || '',
+            degree: exp.degree || '',
+            college: exp.college || '',
+            graduationYear: exp.graduationYear || '',
+            headline: exp.headline || '',
+          })
+        }
+      } catch (err) {
+        console.error('Failed to fetch experience:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchExperience()
+  }, [])
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true)
+      setSaveStatus(null)
+      const token = await getToken()
+      await api.post('/api/experience', { ...form, status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setSaveStatus('success')
+      setTimeout(() => setSaveStatus(null), 2000)
+    } catch (err) {
+      console.error('Failed to save experience:', err)
+      setSaveStatus('error')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const inputClass = "w-full rounded-lg border border-black/[0.05] bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-violet-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-100"
 
@@ -24,8 +75,21 @@ const ExperienceForm = () => {
   ]
 
   const showWork = status === 'working' || status === 'working-studying'
-  const showEducation = status === 'student' || status === 'working-studying'
-  const showJobPrefs = status === 'fresher'
+  const showEducation = status === 'student' || status === 'working-studying' || status === 'fresher'
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900">Experience</h1>
+          <p className="mt-1 text-sm text-gray-500">Tell us about your professional journey</p>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent"></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8">
@@ -35,6 +99,15 @@ const ExperienceForm = () => {
       </div>
 
       <div className="max-w-2xl space-y-8">
+
+        {/* Headline */}
+        <div className="rounded-xl border border-black/[0.05] bg-white p-6">
+          <h2 className="mb-4 text-sm font-medium text-gray-900">Headline</h2>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 mb-1.5">Professional Headline</label>
+            <input type="text" value={form.headline} onChange={e => setForm({...form, headline: e.target.value})} className={inputClass} placeholder="e.g. Full Stack Developer | Open Source Contributor" />
+          </div>
+        </div>
 
         {/* Status selector */}
         <div className="rounded-xl border border-black/[0.05] bg-white p-6">
@@ -68,16 +141,16 @@ const ExperienceForm = () => {
             <h2 className="mb-4 text-sm font-medium text-gray-900">Work Experience</h2>
             <div className="space-y-4">
               <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Current Role</label>
+                <input type="text" value={form.currentRole} onChange={e => setForm({...form, currentRole: e.target.value})} className={inputClass} placeholder="e.g. Senior Frontend Developer" />
+              </div>
+              <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Company</label>
                 <input type="text" value={form.company} onChange={e => setForm({...form, company: e.target.value})} className={inputClass} placeholder="e.g. Google" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Position</label>
-                <input type="text" value={form.position} onChange={e => setForm({...form, position: e.target.value})} className={inputClass} placeholder="e.g. Senior Developer" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Start Date</label>
-                <input type="month" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} className={inputClass} />
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">Years of Experience</label>
+                <input type="text" value={form.yearsOfExp} onChange={e => setForm({...form, yearsOfExp: e.target.value})} className={inputClass} placeholder="e.g. 3 years" />
               </div>
             </div>
           </div>
@@ -89,8 +162,8 @@ const ExperienceForm = () => {
             <h2 className="mb-4 text-sm font-medium text-gray-900">Education Details</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Institution</label>
-                <input type="text" value={form.institution} onChange={e => setForm({...form, institution: e.target.value})} className={inputClass} placeholder="e.g. Mumbai University" />
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">College / Institution</label>
+                <input type="text" value={form.college} onChange={e => setForm({...form, college: e.target.value})} className={inputClass} placeholder="e.g. Mumbai University" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -106,36 +179,19 @@ const ExperienceForm = () => {
           </div>
         )}
 
-        {/* Job preferences for fresher */}
-        {showJobPrefs && (
-          <div className="rounded-xl border border-black/[0.05] bg-white p-6">
-            <h2 className="mb-4 text-sm font-medium text-gray-900">Education Details</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Institution</label>
-                <input type="text" value={form.institution} onChange={e => setForm({...form, institution: e.target.value})} className={inputClass} placeholder="e.g. Mumbai University" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Degree</label>
-                  <input type="text" value={form.degree} onChange={e => setForm({...form, degree: e.target.value})} className={inputClass} placeholder="e.g. B.Tech Computer Science" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Graduation Year</label>
-                  <input type="text" value={form.graduationYear} onChange={e => setForm({...form, graduationYear: e.target.value})} className={inputClass} placeholder="e.g. 2024" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Looking For</label>
-                <input type="text" value={form.lookingFor} onChange={e => setForm({...form, lookingFor: e.target.value})} className={inputClass} placeholder="e.g. Frontend Developer role" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-end">
-          <button className="rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-2.5 text-sm font-medium text-white hover:from-violet-700 hover:to-purple-700">
-            Save Changes
+        <div className="flex items-center justify-end gap-3">
+          {saveStatus === 'success' && (
+            <span className="text-sm text-green-600 font-medium">Saved ✓</span>
+          )}
+          {saveStatus === 'error' && (
+            <span className="text-sm text-red-600 font-medium">Failed to save</span>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-2.5 text-sm font-medium text-white hover:from-violet-700 hover:to-purple-700 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
 

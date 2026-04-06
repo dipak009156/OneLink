@@ -17,8 +17,16 @@ app.use((req, res, next)=>{
 })
 
 const userRoutes = require('./routes/user.routes')
+const platformRoutes = require('./routes/platform.routes')
+const projectRoutes = require('./routes/project.routes')
+const experienceRoutes = require('./routes/experience.routes')
+const settingsRoutes = require('./routes/settings.routes')
 
 app.use('/api/users', userRoutes)
+app.use('/api/platform', platformRoutes)
+app.use('/api/projects', projectRoutes)
+app.use('/api/experience', experienceRoutes)
+app.use('/api/settings', settingsRoutes)
 
 // Global error handler (catches Clerk requireAuth errors)
 app.use((err, req, res, next) => {

@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '@clerk/clerk-react'
 import Navbar from '../components/layout/Navbar'
 import Overview from '../components/dashboard/Overview'
 import EditProfile from '../components/dashboard/EditProfile'
 import Projects from '../components/dashboard/Projects'
 import ExperienceForm from '../components/dashboard/ExperienceForm'
 import SettingsPanel from '../components/dashboard/SettingsPanel'
+import api from '../utils/api'
 
 const NAV_ITEMS = [
   {
@@ -37,19 +39,73 @@ const NAV_ITEMS = [
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview')
+  const { getToken } = useAuth()
 
   const username = 'devrahul'
   const name = 'Rahul Sharma'
   const initials = 'RS'
 
+  // Platform stats state
+  const [stats, setStats] = useState({
+    profileViews: '0',
+    repos: 0,
+    skills: 0,
+    leetcode: 0,
+  })
+  const [githubConnected, setGithubConnected] = useState(false)
+  const [leetcodeConnected, setLeetcodeConnected] = useState(false)
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = await getToken()
+      if (!token) return
+
+      const res = await api.get('/api/platform/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      const { github, leetcode } = res.data
+
+      setGithubConnected(!!github)
+      setLeetcodeConnected(!!leetcode)
+
+      setStats({
+        profileViews: '0',
+        repos: github?.repos?.length || 0,
+        skills: github?.languages?.length || 0,
+        leetcode: leetcode?.totalSolved || 0,
+      })
+    } catch (err) {
+      console.error('Failed to fetch stats:', err)
+    }
+  }, [getToken])
+
+  useEffect(() => {
+    fetchStats()
+  }, [fetchStats])
+
   const renderTab = () => {
     switch (activeTab) {
-      case 'overview': return <Overview username={username} />
-      case 'edit-profile': return <EditProfile />
+      case 'overview': return (
+        <Overview
+          username={username}
+          stats={stats}
+          githubConnected={githubConnected}
+          leetcodeConnected={leetcodeConnected}
+        />
+      )
+      case 'edit-profile': return <EditProfile refreshStats={fetchStats} />
       case 'projects': return <Projects />
       case 'experience': return <ExperienceForm />
       case 'settings': return <SettingsPanel />
-      default: return <Overview username={username} />
+      default: return (
+        <Overview
+          username={username}
+          stats={stats}
+          githubConnected={githubConnected}
+          leetcodeConnected={leetcodeConnected}
+        />
+      )
     }
   }
 
