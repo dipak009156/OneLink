@@ -46,23 +46,23 @@ const ProjectModal = ({ onClose, onSave }) => {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">Project Name</label>
-            <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={inputClass} placeholder="e.g. My Awesome Project" />
+            <input type="text" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={inputClass} placeholder="Enter project name" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">Description</label>
-            <textarea rows="3" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className={`${inputClass} resize-none`} placeholder="Describe your project..." />
+            <textarea rows="3" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className={`${inputClass} resize-none`} placeholder="Enter description" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">Live URL</label>
-            <input type="url" value={form.liveLink} onChange={e => setForm({...form, liveLink: e.target.value})} className={inputClass} placeholder="https://myproject.com" />
+            <input type="url" value={form.liveLink} onChange={e => setForm({...form, liveLink: e.target.value})} className={inputClass} placeholder="Enter live URL" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">Repository URL</label>
-            <input type="url" value={form.repoLink} onChange={e => setForm({...form, repoLink: e.target.value})} className={inputClass} placeholder="https://github.com/username/repo" />
+            <input type="url" value={form.repoLink} onChange={e => setForm({...form, repoLink: e.target.value})} className={inputClass} placeholder="Enter repository URL" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1.5">Tags (comma-separated)</label>
-            <input type="text" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className={inputClass} placeholder="React, TypeScript, Node.js" />
+            <input type="text" value={form.tags} onChange={e => setForm({...form, tags: e.target.value})} className={inputClass} placeholder="Enter tags (e.g. React, Node)" />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-black/[0.03] bg-gray-50/30 px-4 py-3">
             <div className="flex items-center gap-2">

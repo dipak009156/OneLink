@@ -34,8 +34,8 @@ const experienceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['student', 'fresher', 'working', 'working-studying'],
-      default: 'fresher',
+      enum: ['student', 'fresher', 'experience'],
+      default: 'student',
     },
     headline: {
       type: String,

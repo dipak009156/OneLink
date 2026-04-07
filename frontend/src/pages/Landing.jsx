@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowRight, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
@@ -7,17 +7,39 @@ import Hero from '../components/landing/Hero'
 import SearchBar from '../components/landing/SearchBar'
 import FilterChips from '../components/landing/FilterChips'
 import DevCard from '../components/landing/DevCard'
-import { DEMO_DEVS, FILTER_CHIPS } from '../constants'
+import api from '../utils/api'
 
 const Landing = () => {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState('All')
+  const [devs, setDevs] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const filtered = DEMO_DEVS.filter(dev => {
+  useEffect(() => {
+    // Fetch top 6 devs on landing
+    const fetchDevs = async () => {
+      try {
+        setLoading(true)
+        const res = await api.get('/api/users/explore?limit=6')
+        setDevs(res.data)
+      } catch (err) {
+        console.error('Failed to fetch devs:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDevs()
+  }, [])
+
+  // Restore the original local filtering behavior
+  const filtered = devs.filter(dev => {
     const matchesSearch = dev.name.toLowerCase().includes(search.toLowerCase()) ||
+      dev.username.toLowerCase().includes(search.toLowerCase()) ||
       dev.skills.some(s => s.toLowerCase().includes(search.toLowerCase()))
+
     const matchesFilter = activeFilter === 'All' ||
       dev.skills.some(s => s.toLowerCase() === activeFilter.toLowerCase())
+
     return matchesSearch && matchesFilter
   })
 
@@ -29,11 +51,21 @@ const Landing = () => {
         <section className="py-12 md:py-16">
           <SearchBar value={search} onChange={setSearch} />
           <FilterChips active={activeFilter} onSelect={setActiveFilter} />
-          <div className="grid gap-4 mt-12 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map(dev => (
-              <DevCard key={dev.username} dev={dev} />
-            ))}
+
+          <div className="mt-12">
+            {loading ? (
+              <div className="flex justify-center items-center py-10">
+                <Loader2 className="animate-spin text-violet-600" size={32} />
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map(dev => (
+                  <DevCard key={dev.username} dev={dev} />
+                ))}
+              </div>
+            )}
           </div>
+
           <div className="mt-10 text-center">
             <Link
               to="/explore"

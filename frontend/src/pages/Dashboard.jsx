@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import Navbar from '../components/layout/Navbar'
 import Overview from '../components/dashboard/Overview'
 import EditProfile from '../components/dashboard/EditProfile'
@@ -40,10 +40,11 @@ const NAV_ITEMS = [
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview')
   const { getToken } = useAuth()
+  const { user } = useUser()
 
-  const username = 'devrahul'
-  const name = 'Rahul Sharma'
-  const initials = 'RS'
+  const username = user?.username || ''
+  const name = user?.fullName || user?.username || ''
+  const initials = name ? name.substring(0, 2).toUpperCase() : 'U'
 
   // Platform stats state
   const [stats, setStats] = useState({
