@@ -2,8 +2,12 @@ const ProfileHero = ({ profile }) => {
   return (
     <div className="bg-white rounded-2xl border border-black/[0.05] p-8 text-center shadow-sm">
       <div className="flex justify-center mb-4">
-        <div className="w-24 h-24 rounded-full bg-violet-500 flex items-center justify-center">
-          <span className="text-2xl font-semibold text-white">{profile.avatarInitials}</span>
+        <div className="w-24 h-24 rounded-full bg-violet-500 flex items-center justify-center overflow-hidden shadow-inner">
+          {profile.profilePicture ? (
+            <img src={profile.profilePicture} alt={profile.name} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-2xl font-semibold text-white">{profile.avatarInitials}</span>
+          )}
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 mb-1">

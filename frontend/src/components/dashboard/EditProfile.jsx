@@ -24,7 +24,10 @@ const EditProfile = ({ refreshStats }) => {
   const [theme, setTheme] = useState('light')
   const [githubUsername, setGithubUsername] = useState('')
   const [leetcodeUsername, setLeetcodeUsername] = useState('')
+  const [personalWebsite, setPersonalWebsite] = useState('')
+  const [profilePicture, setProfilePicture] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [githubConnecting, setGithubConnecting] = useState(false)
   const [githubStatus, setGithubStatus] = useState(null)
   const [leetcodeConnecting, setLeetcodeConnecting] = useState(false)
@@ -45,7 +48,16 @@ const EditProfile = ({ refreshStats }) => {
           setTheme(profile.theme || 'light')
           setGithubUsername(profile.githubUsername || '')
           setLeetcodeUsername(profile.leetcodeUsername || '')
+          setPersonalWebsite(profile.personalWebsite || '')
+        }
+
+        if (res.data?.user?.profilePicture) {
+          setProfilePicture(res.data.user.profilePicture)
         } else {
+          setProfilePicture('')
+        }
+        
+        if (!res.data?.profile) {
           // If no profile, prepopulate name from Clerk
           setName(user.fullName || user.username || '')
         }
@@ -58,6 +70,41 @@ const EditProfile = ({ refreshStats }) => {
     }
     fetchProfileData()
   }, [user?.username])
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    // Basic validation
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size too large. Max 2MB.')
+      return
+    }
+
+    try {
+      setIsUploading(true)
+      const token = await getToken()
+      
+      const formData = new FormData()
+      formData.append('profilePicture', file)
+
+      const res = await api.post('/api/users/profile-picture', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      setProfilePicture(res.data.profilePicture)
+      alert('Photo uploaded successfully!')
+      if (refreshStats) refreshStats()
+    } catch (err) {
+      console.error('Upload failed:', err)
+      alert('Failed to upload photo')
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   const handleConnectGitHub = async () => {
     if (!githubUsername.trim()) return
@@ -116,7 +163,8 @@ const EditProfile = ({ refreshStats }) => {
         isOpenToWork: openToWork,
         theme,
         githubUsername,
-        leetcodeUsername
+        leetcodeUsername,
+        personalWebsite: personalWebsite.trim()
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -170,13 +218,47 @@ const EditProfile = ({ refreshStats }) => {
           <h2 className="mb-4 text-sm font-medium text-gray-900">Profile Photo</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-violet-500 text-2xl font-medium text-white">{initials}</div>
-              <button className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-black/[0.05] bg-white shadow-sm hover:bg-gray-50">
+              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-2xl font-medium text-white shadow-inner">
+                {profilePicture ? (
+                  <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
+                ) : (
+                  initials
+                )}
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
+              <label 
+                htmlFor="photo-upload" 
+                className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/[0.1] bg-white shadow-sm transition-all hover:bg-gray-50 hover:scale-110 active:scale-95"
+              >
                 <svg className="h-4 w-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-              </button>
+                <input 
+                  id="photo-upload" 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                />
+              </label>
             </div>
             <div>
-              <button className="rounded-lg border border-black/[0.05] bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Upload Photo</button>
+              <label 
+                htmlFor="photo-upload-btn" 
+                className={`inline-block cursor-pointer rounded-lg border border-black/[0.05] bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:bg-gray-100 ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
+              >
+                {isUploading ? 'Uploading...' : 'Upload Photo'}
+                <input 
+                  id="photo-upload-btn" 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                />
+              </label>
               <p className="mt-2 text-xs text-gray-500">JPG, PNG or GIF. Max 2MB.</p>
             </div>
           </div>
@@ -201,6 +283,10 @@ const EditProfile = ({ refreshStats }) => {
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1.5">Location</label>
               <input type="text" value={location} onChange={e => setLocation(e.target.value)} className={inputClass} placeholder="Enter city" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">Personal Website</label>
+              <input type="url" value={personalWebsite} onChange={e => setPersonalWebsite(e.target.value)} className={inputClass} placeholder="https://yourportfolio.com" />
             </div>
           </div>
         </div>

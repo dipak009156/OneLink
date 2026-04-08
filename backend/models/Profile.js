@@ -44,6 +44,10 @@ const profileSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    personalWebsite: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 )

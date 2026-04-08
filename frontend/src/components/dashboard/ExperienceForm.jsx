@@ -14,6 +14,7 @@ const ExperienceForm = () => {
     college: '',
     graduationYear: '',
     headline: '',
+    cgpa: '',
   })
   const { getToken } = useAuth()
 
@@ -34,6 +35,7 @@ const ExperienceForm = () => {
             college: exp.college || '',
             graduationYear: exp.graduationYear || '',
             headline: exp.headline || '',
+            cgpa: exp.cgpa || '',
           })
         }
       } catch (err) {
@@ -168,6 +170,10 @@ const ExperienceForm = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">Graduation Year</label>
                   <input type="text" value={form.graduationYear} onChange={e => setForm({...form, graduationYear: e.target.value})} className={inputClass} placeholder="Enter graduation year" />
                 </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">CGPA / Grade (Optional)</label>
+                <input type="text" value={form.cgpa} onChange={e => setForm({...form, cgpa: e.target.value})} className={inputClass} placeholder="e.g. 8.7 or 90%" />
               </div>
             </div>
           </div>

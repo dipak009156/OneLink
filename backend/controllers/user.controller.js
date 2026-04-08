@@ -77,6 +77,35 @@ const updateProfile = async (req, res) => {
   }
 }
 
+// POST /api/users/profile-picture
+const uploadProfilePicture = async (req, res) => {
+  try {
+    const clerkId = req.auth().userId
+    if (!clerkId) return res.status(401).json({ message: 'Unauthorized' })
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' })
+    }
+
+    const user = await User.findOneAndUpdate(
+      { clerkId },
+      { $set: { profilePicture: req.file.path } },
+      { new: true }
+    )
+
+    if (!user) return res.status(404).json({ message: 'User not found' })
+
+    logger.info(`Profile picture updated for user: ${user.username}`)
+    return res.status(200).json({ 
+      message: 'Profile picture updated', 
+      profilePicture: user.profilePicture 
+    })
+  } catch (err) {
+    logger.error(`uploadProfilePicture error: ${err.message}`)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
 // GET /api/users/u/:username
 // Public route to fetch all data for a user's public profile
 const getPublicProfile = async (req, res) => {
@@ -111,7 +140,8 @@ const getPublicProfile = async (req, res) => {
     return res.status(200).json({
       user: {
         username: user.username,
-        email: user.email // Depending on privacy, we might omit this or use it for the contact button
+        email: user.email,
+        profilePicture: user.profilePicture
       },
       profile,
       preferences,
@@ -190,6 +220,7 @@ const searchUsers = async (req, res) => {
         title: profile.title || 'Developer',
         initials: initials,
         avatarColor: colors[colorIndex],
+        profilePicture: user.profilePicture, // Actual photo if it exists
         skills: skillsArray, // No fallback, show empty if they don't have one
         repos: gh.repos ? gh.repos.length : 0,
         leetcode: lc.totalSolved || 0,
@@ -215,4 +246,4 @@ const searchUsers = async (req, res) => {
   }
 }
 
-module.exports = { syncUser, updateProfile, getPublicProfile, searchUsers }
+module.exports = { syncUser, updateProfile, getPublicProfile, searchUsers, uploadProfilePicture }

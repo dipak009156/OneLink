@@ -55,6 +55,19 @@ const Dashboard = () => {
   })
   const [githubConnected, setGithubConnected] = useState(false)
   const [leetcodeConnected, setLeetcodeConnected] = useState(false)
+  const [profilePicture, setProfilePicture] = useState('')
+
+  const fetchProfile = useCallback(async () => {
+    if (!username) return
+    try {
+      const res = await api.get(`/api/users/u/${username}`)
+      if (res.data?.user?.profilePicture) {
+        setProfilePicture(res.data.user.profilePicture)
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile:', err)
+    }
+  }, [username])
 
   const fetchStats = useCallback(async () => {
     try {
@@ -83,7 +96,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStats()
-  }, [fetchStats])
+    fetchProfile()
+  }, [fetchStats, fetchProfile])
 
   const renderTab = () => {
     switch (activeTab) {
@@ -95,7 +109,7 @@ const Dashboard = () => {
           leetcodeConnected={leetcodeConnected}
         />
       )
-      case 'edit-profile': return <EditProfile refreshStats={fetchStats} />
+      case 'edit-profile': return <EditProfile refreshStats={() => { fetchStats(); fetchProfile(); }} />
       case 'projects': return <Projects />
       case 'experience': return <ExperienceForm />
       case 'settings': return <SettingsPanel />
@@ -143,8 +157,12 @@ const Dashboard = () => {
             {/* User section */}
             <div className="border-t border-black/[0.03] p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-500 text-sm font-medium text-white">
-                  {initials}
+                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-sm font-medium text-white shadow-inner">
+                  {profilePicture ? (
+                    <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
+                  ) : (
+                    initials
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{name}</p>

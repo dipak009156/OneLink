@@ -6,7 +6,6 @@ const experienceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true,
     },
     currentRole: {
       type: String,
@@ -38,6 +37,10 @@ const experienceSchema = new mongoose.Schema(
       default: 'student',
     },
     headline: {
+      type: String,
+      trim: true,
+    },
+    cgpa: {
       type: String,
       trim: true,
     },

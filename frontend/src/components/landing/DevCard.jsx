@@ -7,8 +7,12 @@ const DevCard = ({ dev }) => {
       className="group p-6 rounded-xl border border-black/[0.05] bg-white hover:border-violet-200 hover:shadow-sm transition-all"
     >
       <div className="flex items-start gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${dev.avatarColor} text-white text-sm font-semibold`}>
-          {dev.initials}
+        <div className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-full ${dev.profilePicture ? 'bg-gray-100' : dev.avatarColor} text-white text-sm font-semibold shadow-inner`}>
+          {dev.profilePicture ? (
+            <img src={dev.profilePicture} alt={dev.name} className="h-full w-full object-cover" />
+          ) : (
+            dev.initials
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold group-hover:text-violet-700">{dev.name}</h3>

@@ -52,16 +52,18 @@ const Explore = () => {
   
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (search !== queryParam && activeFilter === 'All') {
+      // If user is searching manually (not through chips)
+      if (search !== queryParam) {
         if (search) {
           setSearchParams({ q: search })
-        } else {
-          setSearchParams({})
+          setActiveFilter('All') // Reset chip if searching manually
+        } else if (!queryParam) { // only clear if we are not already at no query
+           setSearchParams({})
         }
       }
     }, 400) // 400ms debounce
     return () => clearTimeout(handler)
-  }, [search])
+  }, [search, queryParam])
 
   const handleChipSelect = (filter) => {
     setActiveFilter(filter)
@@ -77,19 +79,27 @@ const Explore = () => {
     <div className="flex flex-col min-h-screen bg-white">
       <Navbar />
       
-      <main className="flex-1 px-6 md:px-12 lg:px-20 py-12 md:py-16">
+      <main className="relative flex-1 px-6 md:px-12 lg:px-20 py-12 md:py-16 overflow-hidden">
+        
+        {/* Background Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-violet-100/30 blur-[120px] -z-10 rounded-full" />
         
         {/* Header */}
-        <div className="text-center mb-12">
-
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+            Discover Developers
+          </h1>
           <p className="text-[#737373] text-lg max-w-2xl mx-auto">
-            Discover top talent, explore stunning portfolios, and connect with fellow developers.
+            Find top talent, explore stunning portfolios, and connect with the world's most creative developers.
           </p>
         </div>
 
         {/* Searching and Filters */}
-        <div className="max-w-4xl mx-auto mb-12">
-          <SearchBar value={search} onChange={setSearch} />
+        <div className="max-w-4xl mx-auto mb-16 space-y-6">
+          <div className="relative group">
+             <div className="absolute -inset-1 bg-gradient-to-r from-violet-400 to-indigo-400 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
+             <SearchBar value={search} onChange={setSearch} />
+          </div>
           <FilterChips active={activeFilter} onSelect={handleChipSelect} />
         </div>
 
@@ -105,17 +115,19 @@ const Explore = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center border border-black/[0.05] rounded-2xl bg-gray-50/50">
-            <SearchX size={48} className="text-gray-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No developers found</h3>
-            <p className="text-gray-500 max-w-sm">
-              We couldn't find any developers matching your search criteria. Try a different skill or username.
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center border border-black/[0.05] rounded-3xl bg-white/50 backdrop-blur-sm shadow-sm max-w-2xl mx-auto">
+            <div className="p-4 bg-gray-50 rounded-2xl mb-6">
+              <SearchX size={48} className="text-gray-300" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">No developers found</h3>
+            <p className="text-[#737373] max-w-sm mb-8">
+              We couldn't find anyone matching your current search. Try a different skill, username, or clear your filters to see everyone.
             </p>
             <button 
               onClick={() => handleChipSelect('All')}
-              className="mt-6 px-4 py-2 text-sm font-medium bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              className="px-8 py-3 font-semibold bg-violet-600 text-white rounded-xl hover:bg-violet-700 shadow-lg shadow-violet-200 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
-              Clear Filters
+              Clear all filters
             </button>
           </div>
         )}

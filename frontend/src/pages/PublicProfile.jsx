@@ -64,6 +64,7 @@ const PublicProfile = () => {
     githubUsername: profile?.githubUsername || '',
     isOpenToWork: profile?.isOpenToWork || false,
     avatarInitials: (profile?.name || user.username).substring(0, 2).toUpperCase(),
+    profilePicture: user.profilePicture,
     email: preferences?.showContact ? user.email : ''
   }
 
