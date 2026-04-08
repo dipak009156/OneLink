@@ -43,7 +43,18 @@ const updateProfile = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized: No userId found' })
     }
 
-    const { name, title, summary, location, isOpenToWork, theme, githubUsername, leetcodeUsername } = req.body
+    const { 
+      name, 
+      title, 
+      summary, 
+      location, 
+      isOpenToWork, 
+      theme, 
+      githubUsername, 
+      leetcodeUsername, 
+      personalWebsite,
+      socialLinks 
+    } = req.body
 
     // First find the internal _id of our User document
     const user = await User.findOne({ clerkId })
@@ -59,7 +70,9 @@ const updateProfile = async (req, res) => {
       isOpenToWork,
       theme,
       githubUsername,
-      leetcodeUsername
+      leetcodeUsername,
+      personalWebsite,
+      socialLinks
     }
 
     // Upsert: Create it if it doesn't exist, otherwise update it.

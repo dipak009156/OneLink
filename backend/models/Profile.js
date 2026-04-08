@@ -48,6 +48,20 @@ const profileSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    socialLinks: {
+      linkedin: {
+        type: String,
+        trim: true,
+      },
+      twitter: {
+        type: String,
+        trim: true,
+      },
+      portfolio: {
+        type: String,
+        trim: true,
+      },
+    },
   },
   { timestamps: true }
 )

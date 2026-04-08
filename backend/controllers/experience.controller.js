@@ -28,7 +28,21 @@ const saveExperience = async (req, res) => {
     const user = await User.findOne({ clerkId })
     if (!user) return res.status(404).json({ message: 'User not found' })
 
-    const { currentRole, company, yearsOfExp, degree, college, graduationYear, status, headline } = req.body
+    const { 
+      currentRole, 
+      company, 
+      yearsOfExp, 
+      degree, 
+      college, 
+      graduationYear, 
+      status, 
+      headline,
+      cgpa,
+      startDate,
+      endDate,
+      currentlyWorking,
+      experienceType
+    } = req.body
 
     const experience = await Experience.findOneAndUpdate(
       { userId: user._id },
@@ -43,6 +57,11 @@ const saveExperience = async (req, res) => {
           graduationYear: graduationYear?.trim() || '',
           status: status || 'fresher',
           headline: headline?.trim() || '',
+          cgpa: cgpa?.trim() || '',
+          startDate: startDate?.trim() || '',
+          endDate: endDate?.trim() || '',
+          currentlyWorking: !!currentlyWorking,
+          experienceType: experienceType?.trim() || '',
         },
       },
       { new: true, upsert: true }

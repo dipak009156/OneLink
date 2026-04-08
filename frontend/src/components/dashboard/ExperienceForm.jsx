@@ -15,6 +15,10 @@ const ExperienceForm = () => {
     graduationYear: '',
     headline: '',
     cgpa: '',
+    startDate: '',
+    endDate: '',
+    currentlyWorking: false,
+    experienceType: 'Full-time',
   })
   const { getToken } = useAuth()
 
@@ -36,6 +40,10 @@ const ExperienceForm = () => {
             graduationYear: exp.graduationYear || '',
             headline: exp.headline || '',
             cgpa: exp.cgpa || '',
+            startDate: exp.startDate || '',
+            endDate: exp.endDate || '',
+            currentlyWorking: exp.currentlyWorking || false,
+            experienceType: exp.experienceType || 'Full-time',
           })
         }
       } catch (err) {
@@ -147,6 +155,43 @@ const ExperienceForm = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1.5">Company</label>
                 <input type="text" value={form.company} onChange={e => setForm({...form, company: e.target.value})} className={inputClass} placeholder="Enter company" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Experience Type</label>
+                  <select 
+                    value={form.experienceType} 
+                    onChange={e => setForm({...form, experienceType: e.target.value})} 
+                    className={inputClass}
+                  >
+                    <option value="Full-time">Full-time</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Freelance">Freelance</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 pt-6">
+                  <input 
+                    type="checkbox" 
+                    id="currentlyWorking"
+                    checked={form.currentlyWorking} 
+                    onChange={e => setForm({...form, currentlyWorking: e.target.checked})} 
+                    className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                  />
+                  <label htmlFor="currentlyWorking" className="text-xs font-medium text-gray-700">Currently working here</label>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">Start Date</label>
+                  <input type="text" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} className={inputClass} placeholder="MM/YYYY or Month YYYY" />
+                </div>
+                {!form.currentlyWorking && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">End Date</label>
+                    <input type="text" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className={inputClass} placeholder="MM/YYYY or Month YYYY" />
+                  </div>
+                )}
               </div>
             </div>
           </div>

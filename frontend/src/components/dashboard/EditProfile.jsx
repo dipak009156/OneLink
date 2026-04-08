@@ -26,6 +26,7 @@ const EditProfile = ({ refreshStats }) => {
   const [leetcodeUsername, setLeetcodeUsername] = useState('')
   const [personalWebsite, setPersonalWebsite] = useState('')
   const [profilePicture, setProfilePicture] = useState('')
+  const [linkedin, setLinkedin] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [githubConnecting, setGithubConnecting] = useState(false)
@@ -49,6 +50,7 @@ const EditProfile = ({ refreshStats }) => {
           setGithubUsername(profile.githubUsername || '')
           setLeetcodeUsername(profile.leetcodeUsername || '')
           setPersonalWebsite(profile.personalWebsite || '')
+          setLinkedin(profile.socialLinks?.linkedin || '')
         }
 
         if (res.data?.user?.profilePicture) {
@@ -164,7 +166,10 @@ const EditProfile = ({ refreshStats }) => {
         theme,
         githubUsername,
         leetcodeUsername,
-        personalWebsite: personalWebsite.trim()
+        personalWebsite: personalWebsite.trim(),
+        socialLinks: {
+          linkedin: linkedin.trim()
+        }
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -287,6 +292,10 @@ const EditProfile = ({ refreshStats }) => {
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1.5">Personal Website</label>
               <input type="url" value={personalWebsite} onChange={e => setPersonalWebsite(e.target.value)} className={inputClass} placeholder="https://yourportfolio.com" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1.5">LinkedIn Profile URL</label>
+              <input type="url" value={linkedin} onChange={e => setLinkedin(e.target.value)} className={inputClass} placeholder="https://linkedin.com/in/yourprofile" />
             </div>
           </div>
         </div>
