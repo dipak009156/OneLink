@@ -4,9 +4,9 @@ import { useAuth, useUser } from '@clerk/clerk-react'
 import api from './utils/api'
 
 import Landing from './pages/Landing'
-// import Explore from './pages/Explore'
+import Explore from './pages/Explore'
 import Dashboard from './pages/Dashboard'
-// import PublicProfile from './pages/PublicProfile'
+import PublicProfile from './pages/PublicProfile'
 
 const ProtectedRoute = ({ children }) => {
   const { isSignedIn, isLoaded, getToken } = useAuth()
@@ -38,8 +38,8 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        {/* <Route path="/explore" element={<Explore />} />
-        <Route path="/u/:username" element={<PublicProfile />} /> */}
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/u/:username" element={<PublicProfile />} />
         <Route
           path="/dashboard"
           element={
@@ -48,7 +48,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        {/* <Route path="*" element={<Navigate to="/" />} /> */}
       </Routes>
     </BrowserRouter>
   )

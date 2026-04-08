@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import Navbar from '../components/layout/Navbar'
 import Overview from '../components/dashboard/Overview'
 import EditProfile from '../components/dashboard/EditProfile'
 import Projects from '../components/dashboard/Projects'
 import ExperienceForm from '../components/dashboard/ExperienceForm'
 import SettingsPanel from '../components/dashboard/SettingsPanel'
+import api from '../utils/api'
 
 const NAV_ITEMS = [
   {
@@ -37,19 +39,88 @@ const NAV_ITEMS = [
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('overview')
+  const { getToken } = useAuth()
+  const { user } = useUser()
 
-  const username = 'devrahul'
-  const name = 'Rahul Sharma'
-  const initials = 'RS'
+  const username = user?.username || ''
+  const name = user?.fullName || user?.username || ''
+  const initials = name ? name.substring(0, 2).toUpperCase() : 'U'
+
+  // Platform stats state
+  const [stats, setStats] = useState({
+    profileViews: '0',
+    repos: 0,
+    skills: 0,
+    leetcode: 0,
+  })
+  const [githubConnected, setGithubConnected] = useState(false)
+  const [leetcodeConnected, setLeetcodeConnected] = useState(false)
+  const [profilePicture, setProfilePicture] = useState('')
+
+  const fetchProfile = useCallback(async () => {
+    if (!username) return
+    try {
+      const res = await api.get(`/api/users/u/${username}`)
+      if (res.data?.user?.profilePicture) {
+        setProfilePicture(res.data.user.profilePicture)
+      }
+    } catch (err) {
+      console.error('Failed to fetch profile:', err)
+    }
+  }, [username])
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const token = await getToken()
+      if (!token) return
+
+      const res = await api.get('/api/platform/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      const { github, leetcode } = res.data
+
+      setGithubConnected(!!github)
+      setLeetcodeConnected(!!leetcode)
+
+      setStats({
+        profileViews: '0',
+        repos: github?.repos?.length || 0,
+        skills: github?.languages?.length || 0,
+        leetcode: leetcode?.totalSolved || 0,
+      })
+    } catch (err) {
+      console.error('Failed to fetch stats:', err)
+    }
+  }, [getToken])
+
+  useEffect(() => {
+    fetchStats()
+    fetchProfile()
+  }, [fetchStats, fetchProfile])
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'overview': return <Overview username={username} />
-      case 'edit-profile': return <EditProfile />
+      case 'overview': return (
+        <Overview
+          username={username}
+          stats={stats}
+          githubConnected={githubConnected}
+          leetcodeConnected={leetcodeConnected}
+        />
+      )
+      case 'edit-profile': return <EditProfile refreshStats={() => { fetchStats(); fetchProfile(); }} />
       case 'projects': return <Projects />
       case 'experience': return <ExperienceForm />
       case 'settings': return <SettingsPanel />
-      default: return <Overview username={username} />
+      default: return (
+        <Overview
+          username={username}
+          stats={stats}
+          githubConnected={githubConnected}
+          leetcodeConnected={leetcodeConnected}
+        />
+      )
     }
   }
 
@@ -86,8 +157,12 @@ const Dashboard = () => {
             {/* User section */}
             <div className="border-t border-black/[0.03] p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-500 text-sm font-medium text-white">
-                  {initials}
+                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-sm font-medium text-white shadow-inner">
+                  {profilePicture ? (
+                    <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
+                  ) : (
+                    initials
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
