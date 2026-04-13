@@ -137,7 +137,7 @@ const PublicProfile = () => {
         {preferences?.showProjects !== false && <ProjectsSection projects={projects || []} />}
           {preferences?.showExperience !== false && <ExperienceSection experience={expList} />}
           {preferences?.showExperience !== false && <EducationSection education={eduList} />}
-          {preferences?.showContact !== false && <ContactCTA name={displayProfile.name} email={displayProfile.email} />}
+          {preferences?.showContact === true && <ContactCTA name={displayProfile.name} email={displayProfile.email} />}
         </div>
         <DownloadResume username={username} />
       </div>

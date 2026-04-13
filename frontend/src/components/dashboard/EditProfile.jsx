@@ -5,7 +5,7 @@ import api from '../../utils/api'
 const Toggle = ({ value, onChange }) => (
   <button
     onClick={() => onChange(!value)}
-    className={`relative h-6 w-11 rounded-full transition-colors duration-200 ${value ? 'bg-violet-50 dark:bg-violet-50' : 'bg-gray-200'}`}
+    className={`relative h-6 w-11 rounded-full transition-colors duration-200 ${value ? 'bg-violet-500' : 'bg-gray-200'}`}
   >
     <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white dark:bg-[#0a0f1c]/60 dark:backdrop-blur-xl shadow-sm dark:shadow-2xl dark:shadow-black/40 transition-transform duration-200 ${value ? 'translate-x-5' : 'translate-x-0'}`} />
   </button>
@@ -214,7 +214,7 @@ const EditProfile = ({ refreshStats }) => {
           <h2 className="mb-4 text-sm font-medium text-gray-900 dark:text-slate-50">Profile Photo</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-violet-50 dark:bg-violet-50 text-2xl font-medium text-white shadow-inner">
+              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-2xl font-medium text-white shadow-inner">
                 {profilePicture ? (
                   <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
                 ) : (

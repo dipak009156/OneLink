@@ -157,7 +157,7 @@ const ExperienceForm = () => {
                     : 'border-black/[0.05] dark:border-white/5 bg-white dark:bg-[#0a0f1c]/60 dark:backdrop-blur-xl hover:bg-gray-50 dark:hover:bg-white/5'
                   }`}
               >
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${status === s.id ? 'bg-violet-50 dark:bg-violet-50' : 'bg-gray-100 dark:bg-slate-800'}`}>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${status === s.id ? 'bg-violet-500' : 'bg-gray-100 dark:bg-slate-800'}`}>
                   <span className={status === s.id ? 'text-white' : 'text-gray-500 dark:text-slate-400'}>{s.icon}</span>
                 </div>
                 <div>

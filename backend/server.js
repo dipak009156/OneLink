@@ -7,7 +7,7 @@ require('./utils/db.conn')
 const server = http.createServer(app);
 const PORT = process.env.SERVER_PORT || 3000
 
-server.listen(PORT, (req, res) => {
+server.listen(PORT, () => {
     logger.info(`Server started on port ${PORT}`)
 })
 

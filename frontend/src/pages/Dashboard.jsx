@@ -159,7 +159,7 @@ const Dashboard = () => {
             {/* User section */}
             <div className="border-t border-black/[0.03] p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-50 dark:bg-violet-50 text-sm font-medium text-white shadow-inner">
+                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-sm font-medium text-white shadow-inner">
                   {profilePicture ? (
                     <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
                   ) : (
