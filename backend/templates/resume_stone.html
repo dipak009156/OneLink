@@ -1,499 +1,323 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume - {{profile.name}}</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+<meta charset="UTF-8"/>
+<title>{{profile.name}}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f8f6;
+  --white: #ffffff;
+  --accent: #1a1a1a;
+  --accent-soft: #f0f0ee;
+  --ink-main: #111110;
+  --ink-sub: #4f4f4d;
+  --ink-ghost: #9a9a97;
+  --border: #e8e8e5;
+}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; height: 100%; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f4f0;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            font-size: 13px;
-            color: #1c1917;
-        }
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--ink-main);
+  line-height: 1.5;
+  padding: 40px 20px;
+  min-height: 100%;
+}
 
-        @media print {
-            body { background: white; }
-            .page { box-shadow: none; }
-        }
+@media print {
+  body { padding: 0; background: white; }
+  .page { box-shadow: none; margin: 0; width: 100%; border: none; min-height: 100vh; }
+}
 
-        .page {
-            max-width: 860px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+.page {
+  max-width: 840px;
+  margin: 0 auto;
+  background: var(--white);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  min-height: 1100px; 
+}
 
-        /* ── HEADER (Adjusted for less space) ── */
-        header {
-            background: #1c1917;
-            padding: 20px 48px; /* Reduced top/bottom padding to shrink the space */
-            display: flex;
-            justify-content: space-between;
-            align-items: center; /* Aligns content vertically for a tighter look */
-            gap: 16px; /* Pulls the right side closer to the left */
-        }
+/* ═══════════════════════════════
+   HEADER
+═══════════════════════════════ */
+.header {
+  padding: 60px 60px 45px;
+  border-bottom: 1px solid var(--border);
+}
 
-        .header-left h1 {
-            font-family: 'DM Serif Display', serif;
-            font-size: 36px;
-            font-weight: 400;
-            color: #fafaf9;
-            letter-spacing: -0.5px;
-            line-height: 1;
-        }
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
 
-        .header-left .title-line {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 8px;
-        }
+.name-title h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -1.5px;
+  color: var(--ink-main);
+}
 
-        .header-left .title {
-            font-size: 10px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #a8a29e;
-            font-weight: 500;
-        }
+.role-tag {
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink-sub);
+}
 
-        .header-left .dot { color: #57534e; font-size: 6px; }
+.contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
 
-        .header-left .location {
-            font-size: 11px;
-            color: #78716c;
-            margin-top: 4px;
-        }
+.contact-link {
+  color: var(--ink-sub);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
+}
 
-        .header-right {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            text-align: right;
-        }
+.contact-link:hover { border-color: var(--accent); color: var(--accent); }
 
-        .header-right a, .header-right span {
-            font-size: 11px;
-            color: #a8a29e;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 6px;
-            transition: color 0.2s;
-        }
+/* ═══════════════════════════════
+   CONTENT
+═══════════════════════════════ */
+.content { 
+  padding: 0 60px 60px; 
+  flex-grow: 1; 
+}
 
-        .header-right a:hover { color: #fafaf9; }
+.section { margin-top: 45px; }
 
-        .contact-icon {
-            width: 12px;
-            height: 12px;
-            opacity: 0.5;
-            flex-shrink: 0;
-        }
+.section-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--ink-ghost);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
 
-        /* ── BODY LAYOUT ── */
-        .body {
-            display: flex;
-            flex: 1;
-        }
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
-        /* ── SIDEBAR ── */
-        aside {
-            width: 220px;
-            flex-shrink: 0;
-            background: #fafaf9;
-            border-right: 1px solid #e7e5e4;
-            padding: 32px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
+.about-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--ink-sub);
+  max-width: 90%;
+}
 
-        .section-label {
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #a8a29e;
-            font-weight: 600;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #e7e5e4;
-        }
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-        .skill-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 7px;
-        }
+.skill-tag {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-sub);
+}
 
-        .skill-item span {
-            font-size: 12px;
-            color: #44403c;
-        }
+.exp-item { margin-bottom: 30px; }
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.exp-meta {
+  font-size: 12px;
+  color: var(--ink-ghost);
+  margin-bottom: 10px;
+  display: block;
+}
+.exp-desc { font-size: 13px; color: var(--ink-sub); }
 
-        .skill-dot {
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #d6d3d1;
-            flex-shrink: 0;
-        }
+.projects-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
 
-        .edu-block {
-            padding: 10px 12px;
-            background: white;
-            border: 1px solid #e7e5e4;
-            border-radius: 6px;
-        }
+.project-card {
+  padding: 20px;
+  background: var(--bg);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
 
-        .edu-degree {
-            font-size: 12px;
-            font-weight: 600;
-            color: #1c1917;
-            line-height: 1.3;
-        }
+.project-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; display: block; }
+.project-p { font-size: 12px; color: var(--ink-sub); margin-bottom: 12px; line-height: 1.6; }
 
-        .edu-college {
-            font-size: 11px;
-            color: #78716c;
-            margin-top: 3px;
-        }
+.project-pill-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-decoration: none;
+  color: var(--accent);
+  background: var(--white);
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
 
-        .edu-year {
-            font-size: 10px;
-            color: #a8a29e;
-            margin-top: 4px;
-            font-weight: 500;
-        }
+.edu-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: 6px;
+}
 
-        .social-link {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 11px;
-            color: #78716c;
-            text-decoration: none;
-            margin-bottom: 6px;
-            word-break: break-all;
-        }
+/* ═══════════════════════════════
+   FOOTER
+═══════════════════════════════ */
+.footer-info {
+  padding: 30px 60px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--ink-ghost);
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--white);
+}
 
-        .social-link:hover { color: #1c1917; }
-
-        .social-icon {
-            width: 13px;
-            height: 13px;
-            flex-shrink: 0;
-            opacity: 0.6;
-        }
-
-        /* ── MAIN CONTENT ── */
-        main {
-            flex: 1;
-            padding: 32px 36px;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
-
-        .section-title {
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #a8a29e;
-            font-weight: 600;
-            margin-bottom: 14px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #f0efed;
-        }
-
-        .summary-text {
-            font-size: 12.5px;
-            color: #57534e;
-            line-height: 1.75;
-            font-weight: 300;
-        }
-
-        .exp-item {
-            padding: 14px 16px;
-            border-left: 2px solid #e7e5e4;
-            background: #fafaf9;
-            border-radius: 0 6px 6px 0;
-            margin-bottom: 10px;
-            transition: border-color 0.2s;
-        }
-
-        .exp-item:last-child { margin-bottom: 0; }
-        .exp-item:hover { border-left-color: #a8a29e; }
-
-        .exp-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 4px;
-        }
-
-        .exp-role {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1c1917;
-        }
-
-        .exp-date {
-            font-size: 10px;
-            color: #a8a29e;
-            font-family: 'Inter', monospace;
-            white-space: nowrap;
-            margin-left: 12px;
-            flex-shrink: 0;
-        }
-
-        .exp-company {
-            font-size: 11.5px;
-            color: #78716c;
-            margin-bottom: 6px;
-        }
-
-        .exp-type-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 600;
-            background: #f5f4f0;
-            color: #78716c;
-            border-radius: 3px;
-            border: 1px solid #e7e5e4;
-            margin-bottom: 8px;
-        }
-
-        .exp-headline {
-            font-size: 12px;
-            color: #57534e;
-            line-height: 1.65;
-            font-weight: 300;
-        }
-
-        .project-item {
-            padding: 12px 14px;
-            border: 1px solid #e7e5e4;
-            border-radius: 6px;
-            background: #fafaf9;
-            margin-bottom: 10px;
-        }
-
-        .project-item:last-child { margin-bottom: 0; }
-
-        .project-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .project-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1c1917;
-        }
-
-        .project-links {
-            display: flex;
-            gap: 10px;
-        }
-
-        .project-link {
-            font-size: 10px;
-            color: #a8a29e;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .project-link:hover { color: #57534e; }
-
-        .project-desc {
-            font-size: 12px;
-            color: #57534e;
-            line-height: 1.6;
-            font-weight: 300;
-            margin-bottom: 8px;
-        }
-
-        .tag-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .tag {
-            padding: 2px 8px;
-            font-size: 9.5px;
-            background: #f5f4f0;
-            color: #78716c;
-            border-radius: 3px;
-            border: 1px solid #e7e5e4;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        footer {
-            background: #fafaf9;
-            border-top: 1px solid #e7e5e4;
-            padding: 10px 48px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .footer-text {
-            font-size: 9.5px;
-            color: #d6d3d1;
-            letter-spacing: 0.1em;
-        }
-
-        .footer-brand {
-            font-size: 9.5px;
-            color: #d6d3d1;
-            letter-spacing: 0.05em;
-        }
-
-        .footer-brand strong {
-            color: #a8a29e;
-            font-weight: 600;
-        }
-    </style>
+.footer-info span { color: var(--ink-main); font-weight: 500; }
+</style>
 </head>
 <body>
+
 <div class="page">
-
-    <header>
-        <div class="header-left">
-            <h1>{{profile.name}}</h1>
-            <div class="title-line">
-                <span class="title">{{profile.title}}</span>
-            </div>
-            <div class="location">{{profile.location}}</div>
-        </div>
-        <div class="header-right">
-            <a href="mailto:{{user.email}}">
-                <svg class="contact-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
-                {{user.email}}
-            </a>
-            {{#if profile.githubUsername}}
-            <a href="https://github.com/{{profile.githubUsername}}" target="_blank">
-                <svg class="contact-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                {{profile.githubUsername}}
-            </a>
-            {{/if}}
-            {{#if profile.socialLinks.linkedin}}
-            <a href="{{profile.socialLinks.linkedin}}" target="_blank">
-                <svg class="contact-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                LinkedIn
-            </a>
-            {{/if}}
-        </div>
-    </header>
-
-    <div class="body">
-
-        <aside>
-            <section>
-                <div class="section-label">Technical Skills</div>
-                {{#each skills}}
-                <div class="skill-item">
-                    <div class="skill-dot"></div>
-                    <span>{{this}}</span>
-                </div>
-                {{/each}}
-            </section>
-
-            <section>
-                <div class="section-label">Education</div>
-                <div class="edu-block">
-                    <div class="edu-degree">{{experience.degree}}</div>
-                    <div class="edu-college">{{experience.college}}</div>
-                    <div class="edu-year">{{experience.graduationYear}}</div>
-                </div>
-            </section>
-        </aside>
-
-        <main>
-            {{#if profile.summary}}
-            <section>
-                <div class="section-title">Summary</div>
-                <p class="summary-text">{{profile.summary}}</p>
-            </section>
-            {{/if}}
-
-            {{#if hasJobs}}
-            <section>
-                <div class="section-title">Experience</div>
-                {{#each experience.jobs}}
-                <div class="exp-item">
-                    <div class="exp-header">
-                        <div>
-                            <div class="exp-role">{{currentRole}}</div>
-                            <div class="exp-company">{{company}}</div>
-                        </div>
-                        <div class="exp-date">
-                            {{startDate}} — {{#if currentlyWorking}}Present{{else}}{{endDate}}{{/if}}
-                        </div>
-                    </div>
-                    <span class="exp-type-badge">{{experienceType}}</span>
-                    {{#if headline}}
-                    <p class="exp-headline">{{headline}}</p>
-                    {{/if}}
-                </div>
-                {{/each}}
-            </section>
-            {{/if}}
-
-            {{#if hasProjects}}
-            <section>
-                <div class="section-title">Projects</div>
-                {{#each projects}}
-                <div class="project-item">
-                    <div class="project-header">
-                        <div class="project-name">{{name}}</div>
-                        <div class="project-links">
-                            {{#if liveLink}}
-                            <a class="project-link" href="{{liveLink}}" target="_blank">Live ↗</a>
-                            {{/if}}
-                            {{#if repoLink}}
-                            <a class="project-link" href="{{repoLink}}" target="_blank">Repo ↗</a>
-                            {{/if}}
-                        </div>
-                    </div>
-                    <p class="project-desc">{{description}}</p>
-                    <div class="tag-row">
-                        {{#each tags}}
-                        <span class="tag">{{this}}</span>
-                        {{/each}}
-                    </div>
-                </div>
-                {{/each}}
-            </section>
-            {{/if}}
-        </main>
+  <header class="header">
+    <div class="header-top">
+      <div class="name-title">
+        <h1>{{profile.name}}</h1>
+        <div class="role-tag">{{profile.title}}</div>
+      </div>
+      <div style="text-align: right; color: var(--ink-ghost); font-size: 11px;">
+        {{profile.location}}
+      </div>
     </div>
 
-    <footer>
-        <span class="footer-text">Generated on {{generatedDate}}</span>
-        <span class="footer-brand">Made with <strong>OneLink</strong></span>
-    </footer>
+    <div class="contact-row">
+      <a href="mailto:{{user.email}}" class="contact-link">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg>
+        {{user.email}}
+      </a>
+      {{#if profile.githubUsername}}
+      <a href="https://github.com/{{profile.githubUsername}}" class="contact-link">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        github.com/{{profile.githubUsername}}
+      </a>
+      {{/if}}
+      {{#if profile.socialLinks.linkedin}}
+      <a href="{{profile.socialLinks.linkedin}}" class="contact-link">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+        LinkedIn
+      </a>
+      {{/if}}
+    </div>
+  </header>
 
+  <div class="content">
+    {{#if profile.summary}}
+    <section class="section">
+      <div class="section-label">Summary</div>
+      <p class="about-text">{{profile.summary}}</p>
+    </section>
+    {{/if}}
+
+    <section class="section">
+      <div class="section-label">Technical Toolkit</div>
+      <div class="skills-grid">
+        {{#each skills}}
+        <span class="skill-tag">{{this}}</span>
+        {{/each}}
+      </div>
+    </section>
+
+    {{#if hasJobs}}
+    <section class="section">
+      <div class="section-label">Experience</div>
+      {{#each experience.jobs}}
+      <div class="exp-item">
+        <div class="exp-header">
+          <span>{{currentRole}}</span>
+          <span style="font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 500;">{{startDate}} — {{#if currentlyWorking}}Present{{else}}{{endDate}}{{/if}}</span>
+        </div>
+        <span class="exp-meta">{{company}} · {{experienceType}}</span>
+        <p class="exp-desc">{{description}}</p>
+      </div>
+      {{/each}}
+    </section>
+    {{/if}}
+
+    {{#if hasProjects}}
+    <section class="section">
+      <div class="section-label">Selected Projects</div>
+      <div class="projects-container">
+        {{#each projects}}
+        <div class="project-card">
+          <span class="project-title">{{name}}</span>
+          <p class="project-p">{{description}}</p>
+          <div style="display: flex; gap: 8px;">
+            {{#if liveLink}}<a href="{{liveLink}}" class="project-pill-link">Live ↗</a>{{/if}}
+            {{#if repoLink}}<a href="{{repoLink}}" class="project-pill-link">Repo ↗</a>{{/if}}
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </section>
+    {{/if}}
+
+    <section class="section">
+      <div class="section-label">Education</div>
+      <div class="edu-wrap">
+        <div>
+          <div style="font-weight: 700;">{{experience.degree}}</div>
+          <div style="font-size: 12px; color: var(--ink-sub);">{{experience.college}}</div>
+        </div>
+        <div style="text-align: right; font-family: 'JetBrains Mono'; font-size: 11px;">
+          {{experience.graduationYear}} {{#if experience.cgpa}}· {{experience.cgpa}} GPA{{/if}}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer-info">
+    <div>onelink.dev/u/{{user.username}} · Generated by <span>OneLink</span></div>
+  </footer>
 </div>
+
 </body>
 </html>

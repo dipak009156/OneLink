@@ -76,7 +76,7 @@ const Explore = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-[#0a0f1c]/60 dark:backdrop-blur-xl">
       <Navbar />
       
       <main className="relative flex-1 px-6 md:px-12 lg:px-20 py-12 md:py-16 overflow-hidden">
@@ -106,7 +106,7 @@ const Explore = () => {
         {/* Results Grid */}
         {loading ? (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="animate-spin text-violet-600" size={32} />
+            <Loader2 className="animate-spin text-violet-600 dark:text-violet-400" size={32} />
           </div>
         ) : devs.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
@@ -115,11 +115,11 @@ const Explore = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 px-6 text-center border border-black/[0.05] rounded-3xl bg-white/50 backdrop-blur-sm shadow-sm max-w-2xl mx-auto">
-            <div className="p-4 bg-gray-50 rounded-2xl mb-6">
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center border border-black/[0.05] dark:border-white/5 rounded-3xl bg-white/50 backdrop-blur-sm shadow-sm dark:shadow-2xl dark:shadow-black/40 max-w-2xl mx-auto">
+            <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl mb-6">
               <SearchX size={48} className="text-gray-300" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No developers found</h3>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-2">No developers found</h3>
             <p className="text-[#737373] max-w-sm mb-8">
               We couldn't find anyone matching your current search. Try a different skill, username, or clear your filters to see everyone.
             </p>

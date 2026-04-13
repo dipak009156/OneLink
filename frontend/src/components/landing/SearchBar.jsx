@@ -10,7 +10,7 @@ const SearchBar = ({ value, onChange }) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search developers..."
-        className="w-full pl-12 pr-4 py-4 text-base rounded-full border border-black/[0.05] bg-gray-50/30 focus:outline-none focus:ring-1 focus:ring-violet-200"
+        className="w-full pl-12 pr-4 py-4 text-base rounded-full border border-black/[0.05] dark:border-white/5 bg-gray-50/30 dark:bg-[#030712] dark:selection:bg-violet-50  focus:outline-none focus:ring-1 focus:ring-violet-200"
       />
     </div>
   )

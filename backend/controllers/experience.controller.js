@@ -41,7 +41,8 @@ const saveExperience = async (req, res) => {
       startDate,
       endDate,
       currentlyWorking,
-      experienceType
+      experienceType,
+      workExperiences
     } = req.body
 
     const experience = await Experience.findOneAndUpdate(
@@ -62,6 +63,7 @@ const saveExperience = async (req, res) => {
           endDate: endDate?.trim() || '',
           currentlyWorking: !!currentlyWorking,
           experienceType: experienceType?.trim() || '',
+          workExperiences: Array.isArray(workExperiences) ? workExperiences : [],
         },
       },
       { new: true, upsert: true }

@@ -60,6 +60,14 @@ const experienceSchema = new mongoose.Schema(
       type: String, // e.g., 'Full-time', 'Internship', 'Contract'
       trim: true,
     },
+  workExperiences: [{
+      currentRole: { type: String, trim: true },
+      company: { type: String, trim: true },
+      startDate: { type: String, trim: true },
+      endDate: { type: String, trim: true },
+      currentlyWorking: { type: Boolean, default: false },
+      experienceType: { type: String, trim: true }
+    }],
   },
   { timestamps: true }
 )

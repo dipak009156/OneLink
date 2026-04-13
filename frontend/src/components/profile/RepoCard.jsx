@@ -4,8 +4,8 @@ const LANGUAGE_COLORS = {
   Python: 'bg-green-100 text-green-700',
   Go: 'bg-cyan-100 text-cyan-700',
   Rust: 'bg-orange-100 text-orange-700',
-  Shell: 'bg-gray-100 text-gray-600',
-  default: 'bg-gray-100 text-gray-600'
+  Shell: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300',
+  default: 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300'
 }
 
 const RepoCard = ({ repo }) => {
@@ -16,12 +16,13 @@ const RepoCard = ({ repo }) => {
       href={repo.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="bg-white rounded-xl border border-black/[0.05] p-4 hover:border-violet-200 hover:shadow-sm transition-all group"
+      className="relative overflow-hidden bg-white dark:bg-[#0a0f1c]/60 dark:backdrop-blur-xl rounded-2xl border border-black/[0.05] dark:border-white/5 p-5 hover:-translate-y-1 hover:border-violet-300 dark:hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300 group"
     >
-      <h3 className="text-sm font-medium text-gray-900 group-hover:text-violet-600 transition-colors truncate">
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <h3 className="text-sm font-medium text-gray-900 dark:text-slate-50 group-hover:text-violet-600 dark:text-violet-400 transition-colors truncate">
         {repo.name}
       </h3>
-      <p className="text-xs text-gray-500 mt-1 line-clamp-2 min-h-[2rem]">
+      <p className="text-xs text-gray-500 dark:text-slate-400 mt-1 line-clamp-2 min-h-[2rem]">
         {repo.description}
       </p>
       <div className="flex items-center justify-between mt-3">

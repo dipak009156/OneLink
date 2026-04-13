@@ -7,4 +7,4 @@ export const DEMO_DEVS = [
   { username: 'joshdev', name: 'Josh Williams', title: 'Mobile Developer', initials: 'JW', avatarColor: 'bg-rose-500', skills: ['React Native', 'Flutter'], repos: 14, leetcode: 95 },
 ]
 
-export const FILTER_CHIPS = ['All', 'React', 'Node.js', 'Python', 'TypeScript', 'Fresher', '3+ yrs']
+export const FILTER_CHIPS = ['All', 'React', 'Node.js', 'Python', 'TypeScript', 'Go', 'Rust', 'Next.js', 'Tailwind', 'Docker', 'AWS', 'PostgreSQL', 'GraphQL', 'Figma', 'Solidity']

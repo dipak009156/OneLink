@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-[#030712] text-gray-900 dark:text-slate-50 transition-colors duration-300;
+  }
+}
+
+@theme {
+  --animate-spin-slow: spin 8s linear infinite;
+  --animate-shimmer: shimmer 1.5s infinite;
+
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+}

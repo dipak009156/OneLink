@@ -19,16 +19,28 @@ const renderResume = (data) => {
 
   const { experience, projects, github, profile } = data
 
-  // 1. Split Experience into Jobs and Education
-  const educationList = experience.filter(exp => 
-    exp.status === 'student' || (!exp.currentRole && exp.degree)
-  )
-  const jobs = experience.filter(exp => 
-    exp.status === 'experience' || exp.currentRole
-  )
+  const mainExperience = experience[0] || {}
+  
+  const mainEducation = {
+    degree: mainExperience.degree,
+    college: mainExperience.college,
+    graduationYear: mainExperience.graduationYear
+  }
 
-  // Get the most relevant education entry
-  const mainEducation = educationList[0] || {}
+  let jobs = Array.isArray(mainExperience.workExperiences) ? mainExperience.workExperiences : []
+  
+  // Backwards compatibility for single old flat entry
+  if (jobs.length === 0 && mainExperience.currentRole) {
+    jobs = [{
+      currentRole: mainExperience.currentRole,
+      company: mainExperience.company,
+      startDate: mainExperience.startDate,
+      endDate: mainExperience.endDate,
+      currentlyWorking: mainExperience.currentlyWorking,
+      experienceType: mainExperience.experienceType,
+      headline: mainExperience.headline
+    }]
+  }
 
   // 2. Skill Management
   let allSkills = github.languages || []

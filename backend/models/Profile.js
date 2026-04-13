@@ -24,14 +24,13 @@ const profileSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    skills: {
+      type: [String],
+      default: [],
+    },
     isOpenToWork: {
       type: Boolean,
       default: false,
-    },
-    theme: {
-      type: String,
-      enum: ['light', 'dark', 'matrix'],
-      default: 'light',
     },
     avatarUrl: {
       type: String,
@@ -41,10 +40,6 @@ const profileSchema = new mongoose.Schema(
       trim: true,
     },
     leetcodeUsername: {
-      type: String,
-      trim: true,
-    },
-    personalWebsite: {
       type: String,
       trim: true,
     },

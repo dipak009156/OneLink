@@ -19,8 +19,8 @@ const Hero = () => {
           </button>
         </SignUpButton>
         <Link
-          to="/u/roahnc21"
-          className="px-6 py-3 text-sm font-medium border border-violet-100 text-violet-700 rounded-md hover:bg-violet-50 transition-colors"
+          to="/demo"
+          className="px-6 py-3 text-sm font-medium border border-violet-100 dark:border-violet-500/20 text-violet-700 rounded-md hover:bg-violet-50 dark:bg-violet-500/10 transition-colors"
         >
           View Demo
         </Link>

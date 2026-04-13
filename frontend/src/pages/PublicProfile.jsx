@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react'
 import api from '../utils/api'
 import Navbar from '../components/layout/Navbar'
 import ProfileHero from '../components/profile/ProfileHero'
-import StatsBar from '../components/profile/StatsBar'
 import ReposSection from '../components/profile/RepoSection'
 import SkillsSection from '../components/profile/SkillsSection'
 import LeetCodeSection from '../components/profile/LeetCodeSection'
 import ProjectsSection from '../components/profile/ProjectsSection'
 import ExperienceSection from '../components/profile/ExperienceSection'
+import EducationSection from '../components/profile/EducationSection'
 import ContactCTA from '../components/profile/ContactCTA'
 import DownloadResume from '../components/profile/DownloadResume'
 
@@ -37,7 +37,7 @@ const PublicProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50/30 dark:bg-[#030712] flex items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-violet-500 border-t-transparent"></div>
       </div>
     )
@@ -45,10 +45,10 @@ const PublicProfile = () => {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-50/30 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50/30 dark:bg-[#030712] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Oops!</h2>
-          <p className="text-gray-500">{error || 'Profile not found'}</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-50 mb-2">Oops!</h2>
+          <p className="text-gray-500 dark:text-slate-400">{error || 'Profile not found'}</p>
         </div>
       </div>
     )
@@ -81,7 +81,7 @@ const PublicProfile = () => {
   }
 
   const repos = github?.repos || []
-  const skills = github?.languages || []
+  const skills = profile?.skills || []
   const lcStats = {
     easy: leetcode?.easySolved || 0,
     medium: leetcode?.mediumSolved || 0,
@@ -90,28 +90,57 @@ const PublicProfile = () => {
   }
 
   const expItem = experience?.[0]
-  const expData = expItem ? {
-    role: expItem.currentRole || expItem.degree || 'Developer',
-    company: expItem.company || expItem.college || '',
-    years: expItem.status === 'experience' 
-      ? 'Professional' 
-      : (expItem.status === 'fresher' ? 'Graduate' : (expItem.graduationYear ? `Class of ${expItem.graduationYear}` : 'Student'))
-  } : null
+  let expList = []
+  let eduList = []
+  if (expItem) {
+    if (expItem.workExperiences && expItem.workExperiences.length > 0) {
+      expList = expItem.workExperiences.map((w, idx) => ({
+        id: `work-${idx}`,
+        role: w.currentRole || 'Professional',
+        company: w.company || '',
+        years: `${w.startDate || ''} - ${w.currentlyWorking ? 'Present' : (w.endDate || '')}`.replace(/^- | -$/g, '').trim() || 'Professional'
+      }))
+    }
+    if (expItem.degree && expItem.college) {
+      eduList.push({
+        id: 'edu',
+        degree: expItem.degree,
+        college: expItem.college,
+        years: expItem.graduationYear ? `Class of ${expItem.graduationYear}` : 'Graduate'
+      })
+    }
+    
+    // Fallback if they have old data without workExperiences array
+    if (expList.length === 0 && expItem.currentRole) {
+      expList.push({
+        id: 'legacy-work',
+        role: expItem.currentRole,
+        company: expItem.company,
+        years: expItem.status === 'experience' ? 'Professional' : 'Graduate'
+      })
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50/30 text-gray-900">
-      <Navbar />
-      <div className="mx-auto max-w-4xl px-4 py-12 space-y-8">
+    <div className="relative min-h-screen overflow-hidden bg-gray-50/30 dark:bg-[#030712] dark:selection:bg-violet-500/30 text-gray-900 dark:text-slate-50 transition-all duration-300">
+      {/* Aurora Glow Mesh */}
+      <div className="absolute top-0 -left-1/4 w-[150%] max-w-7xl h-[600px] bg-gradient-to-b from-violet-400/20 via-fuchsia-400/10 to-transparent blur-[120px] -z-10 animate-pulse rounded-full opacity-50 dark:opacity-40 pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+      <div className="absolute top-40 right-0 w-[80%] max-w-5xl h-[500px] bg-gradient-to-l from-indigo-500/10 to-transparent blur-[100px] -z-10 rounded-full opacity-60 pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+      
+      <div className="relative z-0">
+        <Navbar />
+        <div className="mx-auto max-w-4xl px-4 py-12 space-y-8">
         <ProfileHero profile={displayProfile} />
-        <StatsBar stats={stats} />
         {preferences?.showRepos !== false && <ReposSection repos={repos} />}
         {preferences?.showSkills !== false && <SkillsSection skills={skills} />}
         {preferences?.showLeetCode !== false && <LeetCodeSection leetcode={lcStats} />}
         {preferences?.showProjects !== false && <ProjectsSection projects={projects || []} />}
-        {preferences?.showExperience !== false && <ExperienceSection experience={expData} />}
-        {preferences?.showContact !== false && <ContactCTA name={displayProfile.name} email={displayProfile.email} />}
+          {preferences?.showExperience !== false && <ExperienceSection experience={expList} />}
+          {preferences?.showExperience !== false && <EducationSection education={eduList} />}
+          {preferences?.showContact !== false && <ContactCTA name={displayProfile.name} email={displayProfile.email} />}
+        </div>
+        <DownloadResume username={username} />
       </div>
-      <DownloadResume username={username} />
     </div>
   )
 }

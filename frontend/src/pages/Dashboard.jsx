@@ -64,6 +64,9 @@ const Dashboard = () => {
       if (res.data?.user?.profilePicture) {
         setProfilePicture(res.data.user.profilePicture)
       }
+      if (res.data?.profile) {
+        setStats(prev => ({ ...prev, skills: res.data.profile.skills?.length || 0 }))
+      }
     } catch (err) {
       console.error('Failed to fetch profile:', err)
     }
@@ -83,12 +86,11 @@ const Dashboard = () => {
       setGithubConnected(!!github)
       setLeetcodeConnected(!!leetcode)
 
-      setStats({
-        profileViews: '0',
+      setStats(prev => ({
+        ...prev,
         repos: github?.repos?.length || 0,
-        skills: github?.languages?.length || 0,
         leetcode: leetcode?.totalSolved || 0,
-      })
+      }))
     } catch (err) {
       console.error('Failed to fetch stats:', err)
     }
@@ -125,13 +127,13 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/30">
+    <div className="min-h-screen bg-gray-50/30 dark:bg-[#030712] dark:selection:bg-violet-50 ">
       <Navbar />
 
       <div className="flex">
 
         {/* Sidebar */}
-        <aside className="fixed left-0 top-16 z-40 h-[calc(100vh-64px)] w-64 border-r border-black/[0.05] bg-white">
+        <aside className="fixed left-0 top-16 z-40 h-[calc(100vh-64px)] w-64 border-r border-black/[0.05] dark:border-white/5 bg-white dark:bg-[#0a0f1c]/60 dark:backdrop-blur-xl">
           <div className="flex h-full flex-col">
 
             {/* Nav items */}
@@ -142,11 +144,11 @@ const Dashboard = () => {
                   onClick={() => setActiveTab(item.id)}
                   className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 border
                     ${activeTab === item.id
-                      ? 'bg-violet-50 text-violet-700 border-violet-200'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent'
+                      ? 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 border-violet-200'
+                      : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 dark:bg-slate-800/50 hover:text-gray-900 dark:hover:text-white dark:text-slate-50 border-transparent'
                     }`}
                 >
-                  <span className={activeTab === item.id ? 'text-violet-600' : 'text-gray-400'}>
+                  <span className={activeTab === item.id ? 'text-violet-600 dark:text-violet-400' : 'text-gray-400'}>
                     {item.icon}
                   </span>
                   {item.label}
@@ -157,7 +159,7 @@ const Dashboard = () => {
             {/* User section */}
             <div className="border-t border-black/[0.03] p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-500 text-sm font-medium text-white shadow-inner">
+                <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-violet-50 dark:bg-violet-50 text-sm font-medium text-white shadow-inner">
                   {profilePicture ? (
                     <img src={profilePicture} alt={name} className="h-full w-full object-cover" />
                   ) : (
@@ -165,10 +167,10 @@ const Dashboard = () => {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-slate-50 truncate">{name}</p>
                   <Link
                     to={`/u/${username}`}
-                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-violet-600 transition-colors"
+                    className="flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400 hover:text-violet-600 dark:text-violet-400 transition-colors"
                   >
                     View My Profile
                     <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>

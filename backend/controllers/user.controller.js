@@ -52,8 +52,8 @@ const updateProfile = async (req, res) => {
       theme, 
       githubUsername, 
       leetcodeUsername, 
-      personalWebsite,
-      socialLinks 
+      socialLinks,
+      skills 
     } = req.body
 
     // First find the internal _id of our User document
@@ -71,8 +71,8 @@ const updateProfile = async (req, res) => {
       theme,
       githubUsername,
       leetcodeUsername,
-      personalWebsite,
-      socialLinks
+      socialLinks,
+      skills
     }
 
     // Upsert: Create it if it doesn't exist, otherwise update it.
@@ -217,11 +217,8 @@ const searchUsers = async (req, res) => {
       const gh = githubMap.get(uid) || {}
       const lc = leetcodeMap.get(uid) || {}
 
-      // Compute skills from projects tags + basic profile title/etc
-      const skillSet = new Set()
-      userProjects.forEach(p => p.tags && p.tags.forEach(t => skillSet.add(t)))
-      
-      const skillsArray = Array.from(skillSet).slice(0, 4) // cap to 4 skills for UI
+      // Use profile skills directly
+      const skillsArray = Array.isArray(profile.skills) ? profile.skills.slice(0, 4) : []
       
       const name = profile.name || user.username
       const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
