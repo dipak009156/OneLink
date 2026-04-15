@@ -7,7 +7,6 @@ import ProjectsSection from '../components/profile/ProjectsSection'
 import ExperienceSection from '../components/profile/ExperienceSection'
 import EducationSection from '../components/profile/EducationSection'
 import ContactCTA from '../components/profile/ContactCTA'
-import ProjectsSection from '../components/profile/ProjectsSection'
 
 const staticEducation = [
   {
