@@ -5,7 +5,7 @@ const cors = require('cors')
 const logger = require('./utils/logger')
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true
 }))
 app.use(clerkMiddleware())
