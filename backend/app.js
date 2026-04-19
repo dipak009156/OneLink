@@ -5,15 +5,15 @@ const cors = require('cors')
 const logger = require('./utils/logger')
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true
+  origin: process.env.FRONTEND_URL,
+  credentials: true
 }))
 app.use(clerkMiddleware())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use((req, res, next)=>{
-    logger.info(`${req.method} ${req.url}`)
-    next()
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`)
+  next()
 })
 
 const userRoutes = require('./routes/user.routes')
@@ -22,6 +22,10 @@ const projectRoutes = require('./routes/project.routes')
 const experienceRoutes = require('./routes/experience.routes')
 const settingsRoutes = require('./routes/settings.routes')
 const resumeRoutes = require('./routes/resume.routes')
+
+app.get('/', (req, res) => {
+  res.send('OneLink Backend is running')
+})
 
 app.use('/api/users', userRoutes)
 app.use('/api/platform', platformRoutes)
@@ -35,8 +39,8 @@ app.use((err, req, res, next) => {
   const errorMsg = err.message || err.toString() || 'Unknown Error'
   logger.error(`Express Error: ${errorMsg}`)
   if (err.stack) logger.error(err.stack)
-  
-  res.status(err.status || 500).json({ 
+
+  res.status(err.status || 500).json({
     message: errorMsg || 'An unexpected error occurred'
   })
 })
