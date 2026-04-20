@@ -12,8 +12,6 @@ import EducationSection from '../components/profile/EducationSection'
 import ContactCTA from '../components/profile/ContactCTA'
 import DownloadResume from '../components/profile/DownloadResume'
 
-const DEMO_DATA = { /* Keeping DEMO_DATA as fallback or you can remove later, we won't use it */ }
-
 const PublicProfile = () => {
   const { username } = useParams()
   const [data, setData] = useState(null)
