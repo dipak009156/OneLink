@@ -10,10 +10,17 @@ const logger = require('../utils/logger')
 // POST /api/users/sync
 // Called from frontend after login - creates user doc if first time
 const syncUser = async (req, res) => {
-  const { clerkId, username, email } = req.body
+  // SECURITY FIX: Always pull clerkId from the verified JWT, never from req.body
+  // (req.body.clerkId could be spoofed by an authenticated user to impersonate others)
+  const clerkId = req.auth().userId
+  const { username, email } = req.body
 
-  if (!clerkId || !username || !email) {
-    return res.status(400).json({ message: 'clerkId, username and email are required' })
+  if (!clerkId) {
+    return res.status(401).json({ message: 'Unauthorized' })
+  }
+
+  if (!username || !email) {
+    return res.status(400).json({ message: 'username and email are required' })
   }
 
   try {
@@ -150,10 +157,10 @@ const getPublicProfile = async (req, res) => {
     ])
 
     // Build the consolidated response
+    // SECURITY FIX: email is not included in public profile response
     return res.status(200).json({
       user: {
         username: user.username,
-        email: user.email,
         profilePicture: user.profilePicture
       },
       profile,

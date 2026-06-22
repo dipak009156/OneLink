@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import api from './utils/api'
 import { ThemeProvider } from './context/ThemeContext'
+import { initializeSentinelSession } from './utils/sentinelClient'
 
 import Landing from './pages/Landing'
 import Explore from './pages/Explore'
@@ -17,8 +18,10 @@ const ProtectedRoute = ({ children }) => {
   useEffect(() => {
     if (isSignedIn && user) {
       getToken().then(token => {
+        // Bind Sentinel session to this authenticated user
+        initializeSentinelSession(user.id, token)
+
         api.post('/api/users/sync', {
-          clerkId: user.id,
           username: user.username,
           email: user.primaryEmailAddress?.emailAddress,
         }, {
