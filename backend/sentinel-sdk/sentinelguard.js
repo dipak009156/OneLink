@@ -17,7 +17,9 @@ function setCachedVerdict(key, verdict) {
 const sentinelGuard = (actionType = 'generic_action') => {
   return async (req, res, next) => {
     try {
-      const rawSession = req.headers['x-session-id'] || req.headers.authorization || ''
+      const rawSession = req.headers['x-session-id']
+                       || (req.headers.authorization || '').replace(/^Bearer\s+/i, '')
+                       || ''
       const sessionId  = rawSession.length > 128 ? rawSession.slice(-128) : rawSession
       const userId = req.auth?.().userId || 'anonymous'
 
@@ -36,7 +38,7 @@ const sentinelGuard = (actionType = 'generic_action') => {
         const { sentinelTelemetry } = req.body || {}
         const evaluateUrl = `${process.env.SENTINEL_API_URL}/evaluate`
 
-        logger.info(`[Sentinel] Calling → ${evaluateUrl} | key set: ${!!process.env.SENTINEL_SECRET_KEY}`)
+        logger.info(`[Sentinel] Calling → ${evaluateUrl} | key set: ${!!process.env.SENTINEL_API_KEY}`)
 
         const response = await axios.post(
           evaluateUrl,
@@ -53,7 +55,7 @@ const sentinelGuard = (actionType = 'generic_action') => {
           },
           {
             headers: {
-              'X-Sentinel-Key': process.env.SENTINEL_SECRET_KEY,
+              'X-Sentinel-Key': process.env.SENTINEL_API_KEY,
               'Content-Type': 'application/json',
             },
             timeout: 5000,

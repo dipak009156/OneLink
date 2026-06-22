@@ -21,15 +21,26 @@ const ProtectedRoute = ({ children }) => {
         // Bind Sentinel session to this authenticated user
         initializeSentinelSession(user.id, token)
 
+        // Get current telemetry snapshot for the login event
+        const telemetry = window.sentinel?.getTelemetry?.() || {}
+
         api.post('/api/users/sync', {
           username: user.username,
           email: user.primaryEmailAddress?.emailAddress,
+          sentinelTelemetry: {
+            device:     telemetry.device     || {},
+            behavioral: telemetry.behavioral || {},
+          }
         }, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            Authorization:    `Bearer ${token}`,
+            'x-session-id':   window.sentinel?.sessionId || token.slice(-64),
+          }
         }).catch((err) => console.error('User sync failed:', err))
       })
     }
   }, [isSignedIn, user])
+
 
   if (!isLoaded) return null
 
