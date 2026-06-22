@@ -12,11 +12,19 @@ const fileFormat = combine(
   winston.format.json()
 )
 
+// Add 'http' level so morgan logs are captured (sits between verbose and info)
+const customLevels = {
+  levels: { error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6 },
+  colors: { error: 'red', warn: 'yellow', info: 'green', http: 'cyan', verbose: 'white', debug: 'blue', silly: 'grey' }
+}
+winston.addColors(customLevels.colors)
+
 const logger = winston.createLogger({
-  level: 'info',
+  levels: customLevels.levels,
+  level: 'http',   // capture http + info + warn + error
   transports: [
     new winston.transports.Console({
-      format: combine(colorize(), timestamp(), consoleFormat)
+      format: combine(colorize({ all: true }), timestamp(), consoleFormat)
     }),
     new winston.transports.File({ filename: 'logs/error.log', level: 'error', format: fileFormat }),
     new winston.transports.File({ filename: 'logs/combined.log', format: fileFormat })

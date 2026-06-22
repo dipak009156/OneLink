@@ -2,6 +2,7 @@ const express = require('express')
 const { clerkMiddleware } = require('@clerk/express')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
+const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
 const logger = require('./utils/logger')
@@ -17,6 +18,12 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
   credentials: true
 }))
+
+// ── HTTP request logger (morgan → winston) ───────────────────────────────────
+app.use(morgan(':method :url :status :res[content-length] bytes - :response-time ms', {
+  stream: { write: (msg) => logger.http(msg.trim()) }
+}))
+
 app.use(clerkMiddleware())
 
 // ── Sentinel webhook ─────────────────────────────────────────────────────────
@@ -24,10 +31,6 @@ app.use('/webhooks/sentinel', require('./routes/sentinelWebhookRoute'))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url}`)
-  next()
-})
 
 // ── Rate limiters ─────────────────────────────────────────────────────────────
 
