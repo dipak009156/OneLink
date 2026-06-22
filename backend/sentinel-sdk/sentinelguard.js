@@ -19,8 +19,9 @@ const sentinelGuard = (actionType = 'generic_action') => {
     try {
       const rawSession = req.headers['x-session-id'] || req.headers.authorization || ''
       const sessionId  = rawSession.length > 128 ? rawSession.slice(-128) : rawSession
-      // OneLink uses Clerk — get userId from the verified JWT
       const userId = req.auth?.().userId || 'anonymous'
+
+      logger.info(`[Sentinel] action=${actionType} userId=${userId} session=${sessionId.slice(0, 20)}...`)
 
       // 1. Fast blacklist check (enforced even in shadow mode)
       if (sessionId && sessionBlacklist.has(sessionId)) {
@@ -33,8 +34,12 @@ const sentinelGuard = (actionType = 'generic_action') => {
 
       if (!verdict) {
         const { sentinelTelemetry } = req.body || {}
+        const evaluateUrl = `${process.env.SENTINEL_API_URL}/evaluate`
+
+        logger.info(`[Sentinel] Calling → ${evaluateUrl} | key set: ${!!process.env.SENTINEL_SECRET_KEY}`)
+
         const response = await axios.post(
-          `${process.env.SENTINEL_API_URL}/evaluate`,
+          evaluateUrl,
           {
             user_id:    String(userId),
             session_id: String(sessionId),
@@ -54,12 +59,15 @@ const sentinelGuard = (actionType = 'generic_action') => {
             timeout: 5000,
           }
         )
+
         verdict = response.data?.recommended_action ?? 'ALLOW'
+        logger.info(`[Sentinel] Verdict=${verdict} for userId=${userId}`)
         setCachedVerdict(cacheKey, verdict)
+      } else {
+        logger.info(`[Sentinel] Cache hit — verdict=${verdict}`)
       }
 
-      // 3. Shadow mode — data sent to Sentinel for baseline building,
-      //    but NEVER block. Always pass through.
+      // 3. Shadow mode — data sent for baseline, never block
       if (process.env.SENTINEL_SHADOW_MODE === 'true') return next()
 
       // 4. Enforce verdict (only when shadow mode is off)
@@ -77,7 +85,9 @@ const sentinelGuard = (actionType = 'generic_action') => {
       next()
     } catch (err) {
       // Fail-open — never block users because Sentinel is down
-      logger.error('[Sentinel] Guard error:', err.message)
+      const status = err.response?.status
+      const body   = JSON.stringify(err.response?.data)
+      logger.error(`[Sentinel] ERROR — ${err.message} | HTTP ${status} | response: ${body}`)
       next()
     }
   }
