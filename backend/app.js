@@ -63,6 +63,35 @@ app.get('/', (req, res) => {
   res.send('OneLink Backend is running')
 })
 
+// ── Sentinel debug probe (remove after confirming sessions appear) ────────────
+app.get('/api/sentinel-test', async (req, res) => {
+  const axios = require('axios')
+  const url   = `${process.env.SENTINEL_API_URL}/evaluate`
+  const key   = process.env.SENTINEL_API_KEY
+  logger.info(`[SentinelTest] URL=${url} | key set=${!!key} | key prefix=${key ? key.slice(0,8) : 'MISSING'}`)
+  try {
+    const resp = await axios.post(url, {
+      user_id:    'test-user-debug',
+      session_id: 'sess_debugtest123',
+      action:     { type: 'debug_probe' },
+      network:    { ip_address: '1.2.3.4', user_agent: 'DebugProbe/1.0' },
+      device:     {},
+      behavioral: { typing_speed: 0, mouse_velocity: 0, time_on_page: 0 }
+    }, {
+      headers: { 'X-Sentinel-Key': key, 'Content-Type': 'application/json' },
+      timeout: 8000
+    })
+    logger.info(`[SentinelTest] SUCCESS → status=${resp.status} | body=${JSON.stringify(resp.data)}`)
+    res.json({ ok: true, status: resp.status, data: resp.data })
+  } catch (err) {
+    const errInfo = { message: err.message, httpStatus: err.response?.status, body: err.response?.data }
+    logger.error(`[SentinelTest] FAILED → ${JSON.stringify(errInfo)}`)
+    res.status(500).json({ ok: false, ...errInfo })
+  }
+})
+
+
+
 // Apply general limiter to all API routes
 app.use('/api', apiLimiter)
 
