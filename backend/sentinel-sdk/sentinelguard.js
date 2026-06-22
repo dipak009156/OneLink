@@ -22,15 +22,12 @@ const sentinelGuard = (actionType = 'generic_action') => {
       // OneLink uses Clerk — get userId from the verified JWT
       const userId = req.auth?.().userId || 'anonymous'
 
-      // 1. Fast blacklist check — no network
+      // 1. Fast blacklist check (enforced even in shadow mode)
       if (sessionId && sessionBlacklist.has(sessionId)) {
         return res.status(403).json({ success: false, sentinelVerdict: 'TERMINATE_SESSION' })
       }
 
-      // 2. Shadow mode — log but never block
-      if (process.env.SENTINEL_SHADOW_MODE === 'true') return next()
-
-      // 3. Verdict cache check
+      // 2. Verdict cache check
       const cacheKey = `${userId}:${actionType}`
       let verdict = getCachedVerdict(cacheKey)
 
@@ -61,7 +58,11 @@ const sentinelGuard = (actionType = 'generic_action') => {
         setCachedVerdict(cacheKey, verdict)
       }
 
-      // 4. Enforce
+      // 3. Shadow mode — data sent to Sentinel for baseline building,
+      //    but NEVER block. Always pass through.
+      if (process.env.SENTINEL_SHADOW_MODE === 'true') return next()
+
+      // 4. Enforce verdict (only when shadow mode is off)
       if (verdict === 'TERMINATE_SESSION' || verdict === 'ALERT') {
         sessionBlacklist.add(sessionId)
         return res.status(403).json({ success: false, sentinelVerdict: 'TERMINATE_SESSION' })
