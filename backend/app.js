@@ -68,27 +68,42 @@ app.get('/api/sentinel-test', async (req, res) => {
   const axios = require('axios')
   const url   = `${process.env.SENTINEL_API_URL}/evaluate`
   const key   = process.env.SENTINEL_API_KEY
-  logger.info(`[SentinelTest] URL=${url} | key set=${!!key} | key prefix=${key ? key.slice(0,8) : 'MISSING'}`)
-  try {
-    const resp = await axios.post(url, {
-      user_id:    'test-user-debug',
-      session_id: 'sess_debugtest123',
-      action:     { type: 'debug_probe' },
-      network:    { ip_address: '1.2.3.4', user_agent: 'DebugProbe/1.0' },
-      device:     {},
-      behavioral: { typing_speed: 0, mouse_velocity: 0, time_on_page: 0 }
-    }, {
-      headers: { 'X-Sentinel-Key': key, 'Content-Type': 'application/json' },
-      timeout: 8000
-    })
-    logger.info(`[SentinelTest] SUCCESS → status=${resp.status} | body=${JSON.stringify(resp.data)}`)
-    res.json({ ok: true, status: resp.status, data: resp.data })
-  } catch (err) {
-    const errInfo = { message: err.message, httpStatus: err.response?.status, body: err.response?.data }
-    logger.error(`[SentinelTest] FAILED → ${JSON.stringify(errInfo)}`)
-    res.status(500).json({ ok: false, ...errInfo })
+  logger.info(`[SentinelTest] URL=${url} | key prefix=${key ? key.slice(0,8) : 'MISSING'}`)
+
+  const payload = {
+    user_id:    'test-user-debug',
+    session_id: 'sess_debugtest123',
+    action:     { type: 'debug_probe' },
+    network:    { ip_address: '1.2.3.4', user_agent: 'DebugProbe/1.0' },
+    device:     {},
+    behavioral: { typing_speed: 0, mouse_velocity: 0, time_on_page: 0 }
   }
+
+  // Try all common auth header formats
+  const attempts = [
+    { label: 'Authorization: Bearer', headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' } },
+    { label: 'X-API-Key',             headers: { 'X-API-Key': key,                  'Content-Type': 'application/json' } },
+    { label: 'X-Sentinel-Key',        headers: { 'X-Sentinel-Key': key,             'Content-Type': 'application/json' } },
+    { label: 'Authorization: ApiKey', headers: { 'Authorization': `ApiKey ${key}`,  'Content-Type': 'application/json' } },
+  ]
+
+  const results = []
+  for (const attempt of attempts) {
+    try {
+      const resp = await axios.post(url, payload, { headers: attempt.headers, timeout: 8000 })
+      logger.info(`[SentinelTest] ✅ ${attempt.label} → status=${resp.status} body=${JSON.stringify(resp.data)}`)
+      results.push({ header: attempt.label, status: resp.status, ok: true, data: resp.data })
+    } catch (err) {
+      const info = { status: err.response?.status, body: err.response?.data }
+      logger.info(`[SentinelTest] ❌ ${attempt.label} → ${info.status} ${JSON.stringify(info.body)}`)
+      results.push({ header: attempt.label, ok: false, ...info })
+    }
+  }
+
+  res.json(results)
 })
+
+
 
 
 
