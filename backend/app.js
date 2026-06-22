@@ -6,6 +6,10 @@ const app = express()
 const cors = require('cors')
 const logger = require('./utils/logger')
 
+// ── Trust proxy (required on Render / any reverse-proxy host) ─────────────────
+// Allows express-rate-limit to read the real client IP from X-Forwarded-For
+app.set('trust proxy', 1)
+
 // ── Security headers ─────────────────────────────────────────────────────────
 app.use(helmet())
 
