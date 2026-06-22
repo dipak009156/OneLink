@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../../utils/api'
+import { securePost, securePut } from '../../utils/securePost'
 
 const Toggle = ({ value, onChange }) => (
   <button
@@ -66,10 +67,7 @@ const SettingsPanel = () => {
     try {
       setSaving(true)
       setSaveStatus(null)
-      const token = await getToken()
-      await api.post('/api/settings/preferences', visibility, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await securePost('/api/settings/preferences', visibility)
       setSaveStatus('success')
       setTimeout(() => setSaveStatus(null), 2000)
     } catch (err) {
@@ -85,11 +83,8 @@ const SettingsPanel = () => {
     try {
       setUsernameUpdating(true)
       setUsernameStatus(null)
-      const token = await getToken()
-      const res = await api.put('/api/settings/username', { username: username.trim() }, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      setUsername(res.data.username)
+      const res = await securePut('/api/settings/username', { username: username.trim() })
+      setUsername(res.username)
       setUsernameStatus('success')
       setTimeout(() => setUsernameStatus(null), 2000)
     } catch (err) {

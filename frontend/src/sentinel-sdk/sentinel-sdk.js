@@ -64,6 +64,7 @@ class SentinelSDK {
   }
 
   _generateCanvasFingerprint() {
+    if (typeof document === 'undefined') return 'fp_node_env'
     try {
       const canvas = document.createElement('canvas')
       const ctx    = canvas.getContext('2d')
@@ -74,6 +75,8 @@ class SentinelSDK {
       ctx.fillRect(125, 1, 62, 20)
       ctx.fillStyle    = '#069'
       ctx.fillText('SentinelSecureDeviceToken', 2, 15)
+      ctx.fillStyle    = 'rgba(102, 204, 0, 0.7)'   // second layer — richer hash
+      ctx.fillText('SentinelSecureDeviceToken', 4, 17)
       const dataUrl = canvas.toDataURL()
       let hash = 0
       for (let i = 0; i < dataUrl.length; i++) {
@@ -85,6 +88,7 @@ class SentinelSDK {
       return 'fp_fallback'
     }
   }
+
 
   _parseBrowser() {
     const ua = navigator.userAgent

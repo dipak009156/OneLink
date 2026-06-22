@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import api from '../../utils/api'
+import { securePost } from '../../utils/securePost'
 
 const Toggle = ({ value, onChange }) => (
   <button
@@ -74,27 +75,23 @@ const EditProfile = ({ refreshStats }) => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-
-    // Basic validation
     if (file.size > 2 * 1024 * 1024) {
       alert('File size too large. Max 2MB.')
       return
     }
-
     try {
       setIsUploading(true)
-      const token = await getToken()
-      
       const formData = new FormData()
       formData.append('profilePicture', file)
-
+      // File upload uses raw api.post — FormData can't carry sentinelTelemetry JSON
+      const token = await getToken()
       const res = await api.post('/api/users/profile-picture', formData, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          'x-session-id': window.sentinel?.sessionId || '',
         }
       })
-
       setProfilePicture(res.data.profilePicture)
       alert('Photo uploaded successfully!')
       if (refreshStats) refreshStats()
@@ -111,10 +108,7 @@ const EditProfile = ({ refreshStats }) => {
     try {
       setGithubConnecting(true)
       setGithubStatus(null)
-      const token = await getToken()
-      await api.post('/api/platform/connect/github', { githubUsername: githubUsername.trim() }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await securePost('/api/platform/connect/github', { githubUsername: githubUsername.trim() })
       setGithubStatus('success')
       if (refreshStats) refreshStats()
     } catch (err) {
@@ -130,10 +124,7 @@ const EditProfile = ({ refreshStats }) => {
     try {
       setLeetcodeConnecting(true)
       setLeetcodeStatus(null)
-      const token = await getToken()
-      await api.post('/api/platform/connect/leetcode', { leetcodeUsername: leetcodeUsername.trim() }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await securePost('/api/platform/connect/leetcode', { leetcodeUsername: leetcodeUsername.trim() })
       setLeetcodeStatus('success')
       if (refreshStats) refreshStats()
     } catch (err) {
@@ -147,15 +138,7 @@ const EditProfile = ({ refreshStats }) => {
   const handleSave = async () => {
     try {
       setIsSaving(true)
-      const token = await getToken()
-      
-      if (!token) {
-        alert('Authentication failed: Could not get Clerk session token. Please try logging out and in again.')
-        setIsSaving(false)
-        return
-      }
-      
-      await api.post('/api/users/profile', {
+      await securePost('/api/users/profile', {
         name,
         title,
         summary,
@@ -164,13 +147,8 @@ const EditProfile = ({ refreshStats }) => {
         isOpenToWork: openToWork,
         githubUsername,
         leetcodeUsername,
-        socialLinks: {
-          linkedin: linkedin.trim()
-        }
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+        socialLinks: { linkedin: linkedin.trim() }
       })
-      
       alert('Profile saved successfully!')
     } catch (err) {
       console.error('Failed to save profile:', err)

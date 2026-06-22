@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../../utils/api'
+import { securePost, securePut } from '../../utils/securePost'
 import ProjectModal from './ProjectModal'
 
 const Projects = () => {
@@ -43,11 +44,8 @@ const Projects = () => {
         const project = projects.find(p => p._id === id)
         if (!project) return
         try {
-            const token = await getToken()
-            const res = await api.put(`/api/projects/${id}`, { isFeatured: !project.isFeatured }, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
-            setProjects(projects.map(p => p._id === id ? res.data.project : p))
+            const res = await securePut(`/api/projects/${id}`, { isFeatured: !project.isFeatured })
+            setProjects(projects.map(p => p._id === id ? res.project : p))
         } catch (err) {
             console.error('Failed to toggle featured:', err)
         }
@@ -55,11 +53,8 @@ const Projects = () => {
 
     const handleAdd = async (projectData) => {
         try {
-            const token = await getToken()
-            const res = await api.post('/api/projects', projectData, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
-            setProjects([...projects, res.data.project])
+            const res = await securePost('/api/projects', projectData)
+            setProjects([...projects, res.project])
         } catch (err) {
             console.error('Failed to add project:', err)
         }

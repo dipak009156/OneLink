@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 import api from '../../utils/api'
+import { securePost } from '../../utils/securePost'
 
 const ExperienceForm = () => {
   const [loading, setLoading] = useState(true)
@@ -62,10 +63,7 @@ const ExperienceForm = () => {
     try {
       setIsSaving(true)
       setSaveStatus(null)
-      const token = await getToken()
-      await api.post('/api/experience', { ...form, status }, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      await securePost('/api/experience', { ...form, status })
       setSaveStatus('success')
       setTimeout(() => setSaveStatus(null), 2000)
     } catch (err) {
