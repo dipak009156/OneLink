@@ -8,7 +8,7 @@ const sentinelGuard = require('../sentinel-sdk/sentinelguard')
 router.get('/explore', searchUsers)
 router.get('/u/:username', getPublicProfile)
 
-router.post('/sync', requireAuth(),  syncUser)
+router.post('/sync',           requireAuth(), sentinelGuard('login'),                  syncUser)
 router.post('/profile', requireAuth(), sentinelGuard('update_profile'), updateProfile)
 router.post('/profile-picture', requireAuth(), sentinelGuard('profile_picture_upload'), upload.single('profilePicture'), uploadProfilePicture)
 
